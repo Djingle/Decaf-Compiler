@@ -20,8 +20,10 @@ ID [a-zA-Z][a-zA-Z0-9]*
 HEX_DIG [0-9a-fA-F]
 DIG [0-9]
 BOOL "true"|"false"
+CHAR [a-zA-Z]
 
 %%
+"class Program"        {return CLASSPRO}
 "print"				   {return print;}
 "exit"				   {return exit_command;}
 {OBRACK}               {return OBRACK;}
@@ -37,13 +39,14 @@ BOOL "true"|"false"
 {ASSIGNOP}             {return ASSIGNOP;}
 {CONDOP}               {return CONDOP;}
 {ID}                   {return ID;}
-"0x"{HEX}{HEX}*        {return }
-{DIG}{DIG}*            {return }
-{BOOL}                 {return BOOL}
+"0x"{HEX}{HEX}*        {return HEX;}
+{DIG}{DIG}*            {return DEC;}
+{BOOL}                 {return BOOL;}
 \'{CHAR}\'              {
         int temp = yytext[1];
         if(temp >= 32 && temp<=126){
             yylval = temp;
+            return CHARLIT;
         }
         else{
             sprintf(yyerr, "chararter '%c' not detected", temp);
@@ -51,6 +54,7 @@ BOOL "true"|"false"
     }
 \"{CHAR}*\"             {
         memcpy(str, yytext+1, strlen(yytext)-2);
+        return STRLIT;
     }
 .                      {ECHO; yyerror ("unexpected character");}
 
@@ -58,4 +62,5 @@ BOOL "true"|"false"
 
 
 %%
+
 int yywrap (void) {return 1;}
