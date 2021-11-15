@@ -13,34 +13,33 @@ CSBRACK "]"
 ARITHOP "+"|"-"|"*"|"/"|"%"
 RELOP "<="|">="|"<"|">"
 EQOP "=="|"!="
-TYPE "int" | "boolean"
-ASSIGN_OP "="|"+="|"-="
+TYPE "int"|"boolean"
+ASSIGNOP "="|"+="|"-="
 CONDOP "&&"|"||"
 ID [a-zA-Z][a-zA-Z0-9]*
-HEX_DIG [0-9][a-fA-F]
+HEX_DIG [0-9a-fA-F]
 DIG [0-9]
 BOOL "true"|"false"
-CHAR .{1}
 
 %%
 "print"				   {return print;}
 "exit"				   {return exit_command;}
-{OBRACK}                {} 
-{CBRACK}                {}
-{OPAR}                  {}
-{CPAR}                  {}
-{OSBRACK}               {}
-{CSBRACK}               {}
-{ARITHOP}               {}
-{RELOP}                 {}
-{EQOP}                  {}
-{TYPE}                  {}
-{ASSIGN_OP}             {}
-{CONDOP}                {}
-{ID}                    {}
-0x{HEX}{HEX}*           {}
-{DIG}{DIG}*             {}
-{BOOL}                  {}
+{OBRACK}               {return OBRACK;}
+{CBRACK}               {return CBRACK;}
+{OPAR}                 {return OPAR;}
+{CPAR}                 {return CPAR;}
+{OSBRACK}              {return OSBRACK;}
+{CSBRACK}              {return CSBRACK;}
+{ARITHOP}              {return ARITHOP;}
+{RELOP}                {return RELOP;}
+{EQOP}                 {return EQOP;}
+{TYPE}                 {return TYPE;}
+{ASSIGNOP}             {return ASSIGNOP;}
+{CONDOP}               {return CONDOP;}
+{ID}                   {return ID;}
+"0x"{HEX}{HEX}*        {return }
+{DIG}{DIG}*            {return }
+{BOOL}                 {return BOOL}
 \'{CHAR}\'              {
         int temp = yytext[1];
         if(temp >= 32 && temp<=126){
