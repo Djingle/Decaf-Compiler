@@ -20,9 +20,8 @@ void updateSymbolVal(char symbol, int val);
 
 %token print
 %token exit_command
-
-%token <motcle> boolean break class continue else false for if int return true void
 %token OBRACK CBRACK OPAR CPAR OSBRACK CSBRACK ARITHOP RELOP EQOP TYPE ASSIGNOP CONDOP ID CLASSPRO BOOL DEC HEX CHARLIT
+%token VOID FOR IF ELSE RETURN BREAK CONTINUE
 
 
 %%
@@ -42,9 +41,9 @@ field_elem 	: ID 														{printf("field_elem 1\n");}
 			| ID ',' field_elem											{printf("field_elem 3\n");}
 			| ID OSBRACK int_literal CSBRACK ',' field_elem				{printf("field_ellem 4\n");}
 
-method_decl	: 	void ID OPAR t_id CPAR block							{printf("method_decl 1\n");}
+method_decl	: 	VOID ID OPAR t_id CPAR block							{printf("method_decl 1\n");}
 			| 	TYPE ID OPAR t_id CPAR block							{printf("method_decl 2\n");}
-			|	void ID OPAR CPAR block									{printf("method_decl 3\n");}
+			|	VOID ID OPAR CPAR block									{printf("method_decl 3\n");}
 			| 	TYPE ID OPAR CPAR block									{printf("method_decl 4\n");}
 
 t_id 		: 	TYPE ID | TYPE ID ',' t_id								{printf("t_id\n");}
@@ -61,13 +60,13 @@ var_decl : t_id ';'														{printf("var_decl\n");}
 
 statement 	: location ASSIGNOP expr ';'								{printf("statement 1\n");}
 			| method_call ';'											{printf("statement 2\n");}
-			| if OPAR expr CPAR block									{printf("statement 3\n");}
-			| if OPAR expr CPAR block else block						{printf("statement 4\n");}
-			| for ID '=' expr ',' expr block							{printf("statement 5\n");}
-			| return ';'												{printf("statement 6\n");}
-			| return expr ';'											{printf("statement 7\n");}
-			| break ';'													{printf("statement 8\n");}
-			| continue ';'												{printf("statement 9\n");}
+			| IF OPAR expr CPAR block									{printf("statement 3\n");}
+			| IF OPAR expr CPAR block ELSE block						{printf("statement 4\n");}
+			| FOR ID '=' expr ',' expr block							{printf("statement 5\n");}
+			| RETURN ';'												{printf("statement 6\n");}
+			| RETURN expr ';'											{printf("statement 7\n");}
+			| BREAK ';'													{printf("statement 8\n");}
+			| CONTINUE ';'												{printf("statement 9\n");}
 			| block														{printf("statement 10\n");}
 
 method_call : method_name OPAR t_expr CPAR 								{printf("method_call 1\n");}
