@@ -1,0 +1,209 @@
+Non-terminaux inutiles dans la grammaire
+
+    statement
+    location
+    expr
+    literal
+    int_literal
+
+
+Terminaux inutilisés dans la grammaire
+
+    print
+    exit_command
+    OPAR
+    CPAR
+    OSBRACK
+    CSBRACK
+    ARITHOP
+    RELOP
+    EQOP
+    ASSIGNOP
+    CONDOP
+    BOOL
+    DEC
+    HEX
+    CHARLIT
+    VOID
+    FOR
+    IF
+    ELSE
+    RETURN
+    BREAK
+    CONTINUE
+
+
+Règles inutiles dans la grammaire
+
+    6 statement: location ASSIGNOP expr SEMICOL
+
+    7 location: ID
+
+    8 expr: location
+    9     | literal
+
+   10 literal: int_literal
+   11        | BOOL
+
+   12 int_literal: DEC
+   13            | HEX
+
+
+Grammaire
+
+    0 $accept: program $end
+
+    1 program: CLASSPRO OBRACK t_fielDecl CBRACK
+
+    2 t_fielDecl: %empty
+    3           | t_fielDecl field_decl
+
+    4 field_decl: TYPE field_elem SEMICOL
+
+    5 field_elem: ID
+
+
+Terminaux, suivis des règles où ils apparaissent
+
+    $end (0) 0
+    error (256)
+    print (258)
+    exit_command (259)
+    OBRACK (260) 1
+    CBRACK (261) 1
+    OPAR (262)
+    CPAR (263)
+    OSBRACK (264)
+    CSBRACK (265)
+    ARITHOP (266)
+    RELOP (267)
+    EQOP (268)
+    TYPE (269) 4
+    ASSIGNOP (270)
+    CONDOP (271)
+    ID (272) 5
+    CLASSPRO (273) 1
+    BOOL (274)
+    DEC (275)
+    HEX (276)
+    CHARLIT (277)
+    SEMICOL (278) 4
+    VOID (279)
+    FOR (280)
+    IF (281)
+    ELSE (282)
+    RETURN (283)
+    BREAK (284)
+    CONTINUE (285)
+
+
+Non-terminaux, suivis des règles où ils apparaissent
+
+    $accept (31)
+        à gauche: 0
+    program (32)
+        à gauche: 1
+        à droite: 0
+    t_fielDecl (33)
+        à gauche: 2 3
+        à droite: 1 3
+    field_decl (34)
+        à gauche: 4
+        à droite: 3
+    field_elem (35)
+        à gauche: 5
+        à droite: 4
+
+
+État 0
+
+    0 $accept: . program $end
+
+    CLASSPRO  décalage et aller à l'état 1
+
+    program  aller à l'état 2
+
+
+État 1
+
+    1 program: CLASSPRO . OBRACK t_fielDecl CBRACK
+
+    OBRACK  décalage et aller à l'état 3
+
+
+État 2
+
+    0 $accept: program . $end
+
+    $end  décalage et aller à l'état 4
+
+
+État 3
+
+    1 program: CLASSPRO OBRACK . t_fielDecl CBRACK
+
+    $défaut  réduction par utilisation de la règle 2 (t_fielDecl)
+
+    t_fielDecl  aller à l'état 5
+
+
+État 4
+
+    0 $accept: program $end .
+
+    $défaut  accepter
+
+
+État 5
+
+    1 program: CLASSPRO OBRACK t_fielDecl . CBRACK
+    3 t_fielDecl: t_fielDecl . field_decl
+
+    CBRACK  décalage et aller à l'état 6
+    TYPE    décalage et aller à l'état 7
+
+    field_decl  aller à l'état 8
+
+
+État 6
+
+    1 program: CLASSPRO OBRACK t_fielDecl CBRACK .
+
+    $défaut  réduction par utilisation de la règle 1 (program)
+
+
+État 7
+
+    4 field_decl: TYPE . field_elem SEMICOL
+
+    ID  décalage et aller à l'état 9
+
+    field_elem  aller à l'état 10
+
+
+État 8
+
+    3 t_fielDecl: t_fielDecl field_decl .
+
+    $défaut  réduction par utilisation de la règle 3 (t_fielDecl)
+
+
+État 9
+
+    5 field_elem: ID .
+
+    $défaut  réduction par utilisation de la règle 5 (field_elem)
+
+
+État 10
+
+    4 field_decl: TYPE field_elem . SEMICOL
+
+    SEMICOL  décalage et aller à l'état 11
+
+
+État 11
+
+    4 field_decl: TYPE field_elem SEMICOL .
+
+    $défaut  réduction par utilisation de la règle 4 (field_decl)
