@@ -12,4 +12,4 @@ lex.yy.o: $(prefixe).l y.tab.h
 	gcc -c lex.yy.c
 
 clean:
-	rm -f *.o y.tab.c y.tab.h lex.yy.c a.out $(prefixe)
+	rm -f *.o y.tab.c y.tab.h lex.yy.c a.out y.output $(prefixe)

@@ -1,4 +1,5 @@
 %{
+extern int yylval;
 #include "y.tab.h"
 void yyerror (char *s);
 int yylex();
@@ -19,60 +20,59 @@ CONDOP "&&"|"||"
 ID [a-zA-Z][a-zA-Z0-9]*
 HEX_DIG [0-9a-fA-F]
 DIG [0-9]
-/*BOOL "true"|"false"*/
 CHAR [a-zA-Z]
 
 %%
 \/\/[^\n\r]*"\n"        {}
 "class Program"         {return CLASSPRO;}
- /*"WriteInt"			    {return print;}
-"WriteBool"             {return }
-"ReadInt"*/
+ /*"WriteInt"			    {return WRITEINT;}
+"WriteBool"             {return WRITEBOOL;}
+"ReadInt"               {return READINT;}
 "exit"				    {return exit_command;}*/
 {OBRACK}                {return OBRACK;}
 {CBRACK}                {return CBRACK;}
- /*{OPAR}                  {return OPAR;}
+{OPAR}                  {return OPAR;}
 {CPAR}                  {return CPAR;}
 {OSBRACK}               {return OSBRACK;}
 {CSBRACK}               {return CSBRACK;}
 {ARITHOP}               {return ARITHOP;}
 {RELOP}                 {return RELOP;}
-{EQOP}                  {return EQOP;}*/
+{EQOP}                  {return EQOP;}
 {TYPE}                  {return TYPE;}
 {ASSIGNOP}              {return ASSIGNOP;}
- /*{CONDOP}                {return CONDOP;}*/
+{CONDOP}                {return CONDOP;}
 "true"|"false"          {return BOOL;}
 "0x"{HEX_DIG}{HEX_DIG}* {return HEX;}
 {DIG}{DIG}*             {return DEC;}
 ";"                     {return SEMICOL;}
-{ID}                    {return ID;}
- /*"void"                  {return VOID;}
+"void"                  {return VOID;}
 "for"                   {return FOR;}
 "if"                    {return IF;}
 "else"                  {return ELSE;}
 "return"                {return RETURN;}
 "break"                 {return BREAK;}
-"continue"              {return CONTINUE;}*/
-.                       {}
+"continue"              {return CONTINUE;}
+{ID}                    {return ID;}
 
- /*\'{CHAR}\'              {;}
-        int temp = yytext[1];
-        if(temp >= 32 && temp<=126){
+\'{CHAR}\'              {
+        int temp = yytext[0];
+        if (temp >= 32 && temp<=126) {
             yylval = temp;
             return CHARLIT;
         }
-        else{
-            sprintf(yyerr, "chararter '%c' not detected", temp);
+        else {
+            printf("caractère non reconnu\n");
         }
     }
-\"{CHAR}*\"             {;}
-        /*memcpy(str, yytext+1, strlen(yytext)-2);
+ /*\"{CHAR}*\"             {
+        memcpy(str, yytext+1, strlen(yytext)-2);
         return STRLIT;
     }*/
+.                       {}
 
 
 
 
 %%
 
-//int yywrap (void) {return 1;}
+int yywrap() {return 1;}

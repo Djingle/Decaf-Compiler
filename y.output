@@ -1,209 +1,1350 @@
-Non-terminaux inutiles dans la grammaire
-
-    statement
-    location
-    expr
-    literal
-    int_literal
-
-
-Terminaux inutilisés dans la grammaire
-
-    print
-    exit_command
-    OPAR
-    CPAR
-    OSBRACK
-    CSBRACK
-    ARITHOP
-    RELOP
-    EQOP
-    ASSIGNOP
-    CONDOP
-    BOOL
-    DEC
-    HEX
-    CHARLIT
-    VOID
-    FOR
-    IF
-    ELSE
-    RETURN
-    BREAK
-    CONTINUE
+State 3 conflicts: 1 shift/reduce
+State 11 conflicts: 1 shift/reduce
+State 51 conflicts: 1 shift/reduce
+State 85 conflicts: 4 shift/reduce
+State 86 conflicts: 4 shift/reduce
+State 101 conflicts: 4 shift/reduce
 
 
-Règles inutiles dans la grammaire
-
-    6 statement: location ASSIGNOP expr SEMICOL
-
-    7 location: ID
-
-    8 expr: location
-    9     | literal
-
-   10 literal: int_literal
-   11        | BOOL
-
-   12 int_literal: DEC
-   13            | HEX
-
-
-Grammaire
+Grammar
 
     0 $accept: program $end
 
-    1 program: CLASSPRO OBRACK t_fielDecl CBRACK
+    1 program: CLASSPRO OBRACK t_fielDecl t_methoDecl CBRACK
 
-    2 t_fielDecl: %empty
-    3           | t_fielDecl field_decl
+    2 t_fielDecl: field_decl SEMICOL t_fielDecl
+    3           | %empty
 
-    4 field_decl: TYPE field_elem SEMICOL
+    4 t_methoDecl: t_methoDecl method_decl
+    5            | %empty
 
-    5 field_elem: ID
+    6 field_decl: TYPE field_elem
+
+    7 field_elem: ID ',' field_elem
+    8           | ID OSBRACK int_literal CSBRACK ',' field_elem
+    9           | ID
+   10           | ID OSBRACK int_literal CSBRACK
+
+   11 method_decl: VOID ID OPAR t_param CPAR block
+   12            | TYPE ID OPAR t_param CPAR block
+   13            | VOID ID OPAR CPAR block
+   14            | TYPE ID OPAR CPAR block
+
+   15 t_param: TYPE ID
+   16        | TYPE ID ',' t_param
+
+   17 block: OBRACK t_varDecl t_statement CBRACK
+
+   18 t_varDecl: %empty
+   19          | t_varDecl var_decl
+
+   20 t_statement: %empty
+   21            | t_statement statement
+
+   22 var_decl: t_param SEMICOL
+
+   23 statement: location ASSIGNOP expr SEMICOL
+   24          | method_call SEMICOL
+   25          | IF OPAR expr CPAR block
+   26          | IF OPAR expr CPAR block ELSE block
+   27          | FOR ID '=' expr ',' expr block
+   28          | RETURN SEMICOL
+   29          | RETURN expr SEMICOL
+   30          | BREAK SEMICOL
+   31          | CONTINUE SEMICOL
+   32          | block
+
+   33 method_call: method_name OPAR t_expr CPAR
+   34            | method_name OPAR CPAR
+
+   35 t_expr: expr
+   36       | expr ',' t_expr
+
+   37 method_name: ID
+
+   38 location: ID
+   39         | ID OBRACK expr CBRACK
+
+   40 expr: location
+   41     | method_call
+   42     | literal
+   43     | expr bin_op expr
+   44     | '-' expr
+   45     | '!' expr
+   46     | OPAR expr CPAR
+
+   47 bin_op: ARITHOP
+   48       | RELOP
+   49       | EQOP
+   50       | CONDOP
+
+   51 literal: int_literal
+   52        | BOOL
+   53        | CHARLIT
+
+   54 int_literal: DEC
+   55            | HEX
 
 
-Terminaux, suivis des règles où ils apparaissent
+Terminals, with rules where they appear
 
     $end (0) 0
+    '!' (33) 45
+    ',' (44) 7 8 16 27 36
+    '-' (45) 44
+    '=' (61) 27
     error (256)
-    print (258)
-    exit_command (259)
-    OBRACK (260) 1
-    CBRACK (261) 1
-    OPAR (262)
-    CPAR (263)
-    OSBRACK (264)
-    CSBRACK (265)
-    ARITHOP (266)
-    RELOP (267)
-    EQOP (268)
-    TYPE (269) 4
-    ASSIGNOP (270)
-    CONDOP (271)
-    ID (272) 5
-    CLASSPRO (273) 1
-    BOOL (274)
-    DEC (275)
-    HEX (276)
-    CHARLIT (277)
-    SEMICOL (278) 4
-    VOID (279)
-    FOR (280)
-    IF (281)
-    ELSE (282)
-    RETURN (283)
-    BREAK (284)
-    CONTINUE (285)
+    OBRACK (258) 1 17 39
+    CBRACK (259) 1 17 39
+    OPAR (260) 11 12 13 14 25 26 33 34 46
+    CPAR (261) 11 12 13 14 25 26 33 34 46
+    OSBRACK (262) 8 10
+    CSBRACK (263) 8 10
+    ARITHOP (264) 47
+    RELOP (265) 48
+    EQOP (266) 49
+    TYPE (267) 6 12 14 15 16
+    ASSIGNOP (268) 23
+    CONDOP (269) 50
+    ID (270) 7 8 9 10 11 12 13 14 15 16 27 37 38 39
+    CLASSPRO (271) 1
+    BOOL (272) 52
+    DEC (273) 54
+    HEX (274) 55
+    CHARLIT (275) 53
+    SEMICOL (276) 2 22 23 24 28 29 30 31
+    VOID (277) 11 13
+    FOR (278) 27
+    IF (279) 25 26
+    ELSE (280) 26
+    RETURN (281) 28 29
+    BREAK (282) 30
+    CONTINUE (283) 31
 
 
-Non-terminaux, suivis des règles où ils apparaissent
+Nonterminals, with rules where they appear
 
-    $accept (31)
-        à gauche: 0
-    program (32)
-        à gauche: 1
-        à droite: 0
-    t_fielDecl (33)
-        à gauche: 2 3
-        à droite: 1 3
-    field_decl (34)
-        à gauche: 4
-        à droite: 3
-    field_elem (35)
-        à gauche: 5
-        à droite: 4
+    $accept (33)
+        on left: 0
+    program (34)
+        on left: 1
+        on right: 0
+    t_fielDecl (35)
+        on left: 2 3
+        on right: 1 2
+    t_methoDecl (36)
+        on left: 4 5
+        on right: 1 4
+    field_decl (37)
+        on left: 6
+        on right: 2
+    field_elem (38)
+        on left: 7 8 9 10
+        on right: 6 7 8
+    method_decl (39)
+        on left: 11 12 13 14
+        on right: 4
+    t_param (40)
+        on left: 15 16
+        on right: 11 12 16 22
+    block (41)
+        on left: 17
+        on right: 11 12 13 14 25 26 27 32
+    t_varDecl (42)
+        on left: 18 19
+        on right: 17 19
+    t_statement (43)
+        on left: 20 21
+        on right: 17 21
+    var_decl (44)
+        on left: 22
+        on right: 19
+    statement (45)
+        on left: 23 24 25 26 27 28 29 30 31 32
+        on right: 21
+    method_call (46)
+        on left: 33 34
+        on right: 24 41
+    t_expr (47)
+        on left: 35 36
+        on right: 33 36
+    method_name (48)
+        on left: 37
+        on right: 33 34
+    location (49)
+        on left: 38 39
+        on right: 23 40
+    expr (50)
+        on left: 40 41 42 43 44 45 46
+        on right: 23 25 26 27 29 35 36 39 43 44 45 46
+    bin_op (51)
+        on left: 47 48 49 50
+        on right: 43
+    literal (52)
+        on left: 51 52 53
+        on right: 42
+    int_literal (53)
+        on left: 54 55
+        on right: 8 10 51
 
 
-État 0
+State 0
 
     0 $accept: . program $end
 
-    CLASSPRO  décalage et aller à l'état 1
+    CLASSPRO  shift, and go to state 1
 
-    program  aller à l'état 2
-
-
-État 1
-
-    1 program: CLASSPRO . OBRACK t_fielDecl CBRACK
-
-    OBRACK  décalage et aller à l'état 3
+    program  go to state 2
 
 
-État 2
+State 1
+
+    1 program: CLASSPRO . OBRACK t_fielDecl t_methoDecl CBRACK
+
+    OBRACK  shift, and go to state 3
+
+
+State 2
 
     0 $accept: program . $end
 
-    $end  décalage et aller à l'état 4
+    $end  shift, and go to state 4
 
 
-État 3
+State 3
 
-    1 program: CLASSPRO OBRACK . t_fielDecl CBRACK
+    1 program: CLASSPRO OBRACK . t_fielDecl t_methoDecl CBRACK
 
-    $défaut  réduction par utilisation de la règle 2 (t_fielDecl)
+    TYPE  shift, and go to state 5
 
-    t_fielDecl  aller à l'état 5
+    TYPE      [reduce using rule 3 (t_fielDecl)]
+    $default  reduce using rule 3 (t_fielDecl)
+
+    t_fielDecl  go to state 6
+    field_decl  go to state 7
 
 
-État 4
+State 4
 
     0 $accept: program $end .
 
-    $défaut  accepter
+    $default  accept
 
 
-État 5
+State 5
 
-    1 program: CLASSPRO OBRACK t_fielDecl . CBRACK
-    3 t_fielDecl: t_fielDecl . field_decl
+    6 field_decl: TYPE . field_elem
 
-    CBRACK  décalage et aller à l'état 6
-    TYPE    décalage et aller à l'état 7
+    ID  shift, and go to state 8
 
-    field_decl  aller à l'état 8
+    field_elem  go to state 9
 
 
-État 6
+State 6
 
-    1 program: CLASSPRO OBRACK t_fielDecl CBRACK .
+    1 program: CLASSPRO OBRACK t_fielDecl . t_methoDecl CBRACK
 
-    $défaut  réduction par utilisation de la règle 1 (program)
+    $default  reduce using rule 5 (t_methoDecl)
 
-
-État 7
-
-    4 field_decl: TYPE . field_elem SEMICOL
-
-    ID  décalage et aller à l'état 9
-
-    field_elem  aller à l'état 10
+    t_methoDecl  go to state 10
 
 
-État 8
+State 7
 
-    3 t_fielDecl: t_fielDecl field_decl .
+    2 t_fielDecl: field_decl . SEMICOL t_fielDecl
 
-    $défaut  réduction par utilisation de la règle 3 (t_fielDecl)
-
-
-État 9
-
-    5 field_elem: ID .
-
-    $défaut  réduction par utilisation de la règle 5 (field_elem)
+    SEMICOL  shift, and go to state 11
 
 
-État 10
+State 8
 
-    4 field_decl: TYPE field_elem . SEMICOL
+    7 field_elem: ID . ',' field_elem
+    8           | ID . OSBRACK int_literal CSBRACK ',' field_elem
+    9           | ID .
+   10           | ID . OSBRACK int_literal CSBRACK
 
-    SEMICOL  décalage et aller à l'état 11
+    OSBRACK  shift, and go to state 12
+    ','      shift, and go to state 13
+
+    $default  reduce using rule 9 (field_elem)
 
 
-État 11
+State 9
 
-    4 field_decl: TYPE field_elem SEMICOL .
+    6 field_decl: TYPE field_elem .
 
-    $défaut  réduction par utilisation de la règle 4 (field_decl)
+    $default  reduce using rule 6 (field_decl)
+
+
+State 10
+
+    1 program: CLASSPRO OBRACK t_fielDecl t_methoDecl . CBRACK
+    4 t_methoDecl: t_methoDecl . method_decl
+
+    CBRACK  shift, and go to state 14
+    TYPE    shift, and go to state 15
+    VOID    shift, and go to state 16
+
+    method_decl  go to state 17
+
+
+State 11
+
+    2 t_fielDecl: field_decl SEMICOL . t_fielDecl
+
+    TYPE  shift, and go to state 5
+
+    TYPE      [reduce using rule 3 (t_fielDecl)]
+    $default  reduce using rule 3 (t_fielDecl)
+
+    t_fielDecl  go to state 18
+    field_decl  go to state 7
+
+
+State 12
+
+    8 field_elem: ID OSBRACK . int_literal CSBRACK ',' field_elem
+   10           | ID OSBRACK . int_literal CSBRACK
+
+    DEC  shift, and go to state 19
+    HEX  shift, and go to state 20
+
+    int_literal  go to state 21
+
+
+State 13
+
+    7 field_elem: ID ',' . field_elem
+
+    ID  shift, and go to state 8
+
+    field_elem  go to state 22
+
+
+State 14
+
+    1 program: CLASSPRO OBRACK t_fielDecl t_methoDecl CBRACK .
+
+    $default  reduce using rule 1 (program)
+
+
+State 15
+
+   12 method_decl: TYPE . ID OPAR t_param CPAR block
+   14            | TYPE . ID OPAR CPAR block
+
+    ID  shift, and go to state 23
+
+
+State 16
+
+   11 method_decl: VOID . ID OPAR t_param CPAR block
+   13            | VOID . ID OPAR CPAR block
+
+    ID  shift, and go to state 24
+
+
+State 17
+
+    4 t_methoDecl: t_methoDecl method_decl .
+
+    $default  reduce using rule 4 (t_methoDecl)
+
+
+State 18
+
+    2 t_fielDecl: field_decl SEMICOL t_fielDecl .
+
+    $default  reduce using rule 2 (t_fielDecl)
+
+
+State 19
+
+   54 int_literal: DEC .
+
+    $default  reduce using rule 54 (int_literal)
+
+
+State 20
+
+   55 int_literal: HEX .
+
+    $default  reduce using rule 55 (int_literal)
+
+
+State 21
+
+    8 field_elem: ID OSBRACK int_literal . CSBRACK ',' field_elem
+   10           | ID OSBRACK int_literal . CSBRACK
+
+    CSBRACK  shift, and go to state 25
+
+
+State 22
+
+    7 field_elem: ID ',' field_elem .
+
+    $default  reduce using rule 7 (field_elem)
+
+
+State 23
+
+   12 method_decl: TYPE ID . OPAR t_param CPAR block
+   14            | TYPE ID . OPAR CPAR block
+
+    OPAR  shift, and go to state 26
+
+
+State 24
+
+   11 method_decl: VOID ID . OPAR t_param CPAR block
+   13            | VOID ID . OPAR CPAR block
+
+    OPAR  shift, and go to state 27
+
+
+State 25
+
+    8 field_elem: ID OSBRACK int_literal CSBRACK . ',' field_elem
+   10           | ID OSBRACK int_literal CSBRACK .
+
+    ','  shift, and go to state 28
+
+    $default  reduce using rule 10 (field_elem)
+
+
+State 26
+
+   12 method_decl: TYPE ID OPAR . t_param CPAR block
+   14            | TYPE ID OPAR . CPAR block
+
+    CPAR  shift, and go to state 29
+    TYPE  shift, and go to state 30
+
+    t_param  go to state 31
+
+
+State 27
+
+   11 method_decl: VOID ID OPAR . t_param CPAR block
+   13            | VOID ID OPAR . CPAR block
+
+    CPAR  shift, and go to state 32
+    TYPE  shift, and go to state 30
+
+    t_param  go to state 33
+
+
+State 28
+
+    8 field_elem: ID OSBRACK int_literal CSBRACK ',' . field_elem
+
+    ID  shift, and go to state 8
+
+    field_elem  go to state 34
+
+
+State 29
+
+   14 method_decl: TYPE ID OPAR CPAR . block
+
+    OBRACK  shift, and go to state 35
+
+    block  go to state 36
+
+
+State 30
+
+   15 t_param: TYPE . ID
+   16        | TYPE . ID ',' t_param
+
+    ID  shift, and go to state 37
+
+
+State 31
+
+   12 method_decl: TYPE ID OPAR t_param . CPAR block
+
+    CPAR  shift, and go to state 38
+
+
+State 32
+
+   13 method_decl: VOID ID OPAR CPAR . block
+
+    OBRACK  shift, and go to state 35
+
+    block  go to state 39
+
+
+State 33
+
+   11 method_decl: VOID ID OPAR t_param . CPAR block
+
+    CPAR  shift, and go to state 40
+
+
+State 34
+
+    8 field_elem: ID OSBRACK int_literal CSBRACK ',' field_elem .
+
+    $default  reduce using rule 8 (field_elem)
+
+
+State 35
+
+   17 block: OBRACK . t_varDecl t_statement CBRACK
+
+    $default  reduce using rule 18 (t_varDecl)
+
+    t_varDecl  go to state 41
+
+
+State 36
+
+   14 method_decl: TYPE ID OPAR CPAR block .
+
+    $default  reduce using rule 14 (method_decl)
+
+
+State 37
+
+   15 t_param: TYPE ID .
+   16        | TYPE ID . ',' t_param
+
+    ','  shift, and go to state 42
+
+    $default  reduce using rule 15 (t_param)
+
+
+State 38
+
+   12 method_decl: TYPE ID OPAR t_param CPAR . block
+
+    OBRACK  shift, and go to state 35
+
+    block  go to state 43
+
+
+State 39
+
+   13 method_decl: VOID ID OPAR CPAR block .
+
+    $default  reduce using rule 13 (method_decl)
+
+
+State 40
+
+   11 method_decl: VOID ID OPAR t_param CPAR . block
+
+    OBRACK  shift, and go to state 35
+
+    block  go to state 44
+
+
+State 41
+
+   17 block: OBRACK t_varDecl . t_statement CBRACK
+   19 t_varDecl: t_varDecl . var_decl
+
+    TYPE  shift, and go to state 30
+
+    $default  reduce using rule 20 (t_statement)
+
+    t_param      go to state 45
+    t_statement  go to state 46
+    var_decl     go to state 47
+
+
+State 42
+
+   16 t_param: TYPE ID ',' . t_param
+
+    TYPE  shift, and go to state 30
+
+    t_param  go to state 48
+
+
+State 43
+
+   12 method_decl: TYPE ID OPAR t_param CPAR block .
+
+    $default  reduce using rule 12 (method_decl)
+
+
+State 44
+
+   11 method_decl: VOID ID OPAR t_param CPAR block .
+
+    $default  reduce using rule 11 (method_decl)
+
+
+State 45
+
+   22 var_decl: t_param . SEMICOL
+
+    SEMICOL  shift, and go to state 49
+
+
+State 46
+
+   17 block: OBRACK t_varDecl t_statement . CBRACK
+   21 t_statement: t_statement . statement
+
+    OBRACK    shift, and go to state 35
+    CBRACK    shift, and go to state 50
+    ID        shift, and go to state 51
+    FOR       shift, and go to state 52
+    IF        shift, and go to state 53
+    RETURN    shift, and go to state 54
+    BREAK     shift, and go to state 55
+    CONTINUE  shift, and go to state 56
+
+    block        go to state 57
+    statement    go to state 58
+    method_call  go to state 59
+    method_name  go to state 60
+    location     go to state 61
+
+
+State 47
+
+   19 t_varDecl: t_varDecl var_decl .
+
+    $default  reduce using rule 19 (t_varDecl)
+
+
+State 48
+
+   16 t_param: TYPE ID ',' t_param .
+
+    $default  reduce using rule 16 (t_param)
+
+
+State 49
+
+   22 var_decl: t_param SEMICOL .
+
+    $default  reduce using rule 22 (var_decl)
+
+
+State 50
+
+   17 block: OBRACK t_varDecl t_statement CBRACK .
+
+    $default  reduce using rule 17 (block)
+
+
+State 51
+
+   37 method_name: ID .
+   38 location: ID .
+   39         | ID . OBRACK expr CBRACK
+
+    OBRACK  shift, and go to state 62
+
+    OBRACK    [reduce using rule 38 (location)]
+    OPAR      reduce using rule 37 (method_name)
+    $default  reduce using rule 38 (location)
+
+
+State 52
+
+   27 statement: FOR . ID '=' expr ',' expr block
+
+    ID  shift, and go to state 63
+
+
+State 53
+
+   25 statement: IF . OPAR expr CPAR block
+   26          | IF . OPAR expr CPAR block ELSE block
+
+    OPAR  shift, and go to state 64
+
+
+State 54
+
+   28 statement: RETURN . SEMICOL
+   29          | RETURN . expr SEMICOL
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    SEMICOL  shift, and go to state 68
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 73
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 55
+
+   30 statement: BREAK . SEMICOL
+
+    SEMICOL  shift, and go to state 76
+
+
+State 56
+
+   31 statement: CONTINUE . SEMICOL
+
+    SEMICOL  shift, and go to state 77
+
+
+State 57
+
+   32 statement: block .
+
+    $default  reduce using rule 32 (statement)
+
+
+State 58
+
+   21 t_statement: t_statement statement .
+
+    $default  reduce using rule 21 (t_statement)
+
+
+State 59
+
+   24 statement: method_call . SEMICOL
+
+    SEMICOL  shift, and go to state 78
+
+
+State 60
+
+   33 method_call: method_name . OPAR t_expr CPAR
+   34            | method_name . OPAR CPAR
+
+    OPAR  shift, and go to state 79
+
+
+State 61
+
+   23 statement: location . ASSIGNOP expr SEMICOL
+
+    ASSIGNOP  shift, and go to state 80
+
+
+State 62
+
+   39 location: ID OBRACK . expr CBRACK
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 81
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 63
+
+   27 statement: FOR ID . '=' expr ',' expr block
+
+    '='  shift, and go to state 82
+
+
+State 64
+
+   25 statement: IF OPAR . expr CPAR block
+   26          | IF OPAR . expr CPAR block ELSE block
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 83
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 65
+
+   46 expr: OPAR . expr CPAR
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 84
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 66
+
+   52 literal: BOOL .
+
+    $default  reduce using rule 52 (literal)
+
+
+State 67
+
+   53 literal: CHARLIT .
+
+    $default  reduce using rule 53 (literal)
+
+
+State 68
+
+   28 statement: RETURN SEMICOL .
+
+    $default  reduce using rule 28 (statement)
+
+
+State 69
+
+   44 expr: '-' . expr
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 85
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 70
+
+   45 expr: '!' . expr
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 86
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 71
+
+   41 expr: method_call .
+
+    $default  reduce using rule 41 (expr)
+
+
+State 72
+
+   40 expr: location .
+
+    $default  reduce using rule 40 (expr)
+
+
+State 73
+
+   29 statement: RETURN expr . SEMICOL
+   43 expr: expr . bin_op expr
+
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+    SEMICOL  shift, and go to state 91
+
+    bin_op  go to state 92
+
+
+State 74
+
+   42 expr: literal .
+
+    $default  reduce using rule 42 (expr)
+
+
+State 75
+
+   51 literal: int_literal .
+
+    $default  reduce using rule 51 (literal)
+
+
+State 76
+
+   30 statement: BREAK SEMICOL .
+
+    $default  reduce using rule 30 (statement)
+
+
+State 77
+
+   31 statement: CONTINUE SEMICOL .
+
+    $default  reduce using rule 31 (statement)
+
+
+State 78
+
+   24 statement: method_call SEMICOL .
+
+    $default  reduce using rule 24 (statement)
+
+
+State 79
+
+   33 method_call: method_name OPAR . t_expr CPAR
+   34            | method_name OPAR . CPAR
+
+    OPAR     shift, and go to state 65
+    CPAR     shift, and go to state 93
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    t_expr       go to state 94
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 95
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 80
+
+   23 statement: location ASSIGNOP . expr SEMICOL
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 96
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 81
+
+   39 location: ID OBRACK expr . CBRACK
+   43 expr: expr . bin_op expr
+
+    CBRACK   shift, and go to state 97
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+
+    bin_op  go to state 92
+
+
+State 82
+
+   27 statement: FOR ID '=' . expr ',' expr block
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 98
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 83
+
+   25 statement: IF OPAR expr . CPAR block
+   26          | IF OPAR expr . CPAR block ELSE block
+   43 expr: expr . bin_op expr
+
+    CPAR     shift, and go to state 99
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+
+    bin_op  go to state 92
+
+
+State 84
+
+   43 expr: expr . bin_op expr
+   46     | OPAR expr . CPAR
+
+    CPAR     shift, and go to state 100
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+
+    bin_op  go to state 92
+
+
+State 85
+
+   43 expr: expr . bin_op expr
+   44     | '-' expr .
+
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+
+    ARITHOP   [reduce using rule 44 (expr)]
+    RELOP     [reduce using rule 44 (expr)]
+    EQOP      [reduce using rule 44 (expr)]
+    CONDOP    [reduce using rule 44 (expr)]
+    $default  reduce using rule 44 (expr)
+
+    bin_op  go to state 92
+
+
+State 86
+
+   43 expr: expr . bin_op expr
+   45     | '!' expr .
+
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+
+    ARITHOP   [reduce using rule 45 (expr)]
+    RELOP     [reduce using rule 45 (expr)]
+    EQOP      [reduce using rule 45 (expr)]
+    CONDOP    [reduce using rule 45 (expr)]
+    $default  reduce using rule 45 (expr)
+
+    bin_op  go to state 92
+
+
+State 87
+
+   47 bin_op: ARITHOP .
+
+    $default  reduce using rule 47 (bin_op)
+
+
+State 88
+
+   48 bin_op: RELOP .
+
+    $default  reduce using rule 48 (bin_op)
+
+
+State 89
+
+   49 bin_op: EQOP .
+
+    $default  reduce using rule 49 (bin_op)
+
+
+State 90
+
+   50 bin_op: CONDOP .
+
+    $default  reduce using rule 50 (bin_op)
+
+
+State 91
+
+   29 statement: RETURN expr SEMICOL .
+
+    $default  reduce using rule 29 (statement)
+
+
+State 92
+
+   43 expr: expr bin_op . expr
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 101
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 93
+
+   34 method_call: method_name OPAR CPAR .
+
+    $default  reduce using rule 34 (method_call)
+
+
+State 94
+
+   33 method_call: method_name OPAR t_expr . CPAR
+
+    CPAR  shift, and go to state 102
+
+
+State 95
+
+   35 t_expr: expr .
+   36       | expr . ',' t_expr
+   43 expr: expr . bin_op expr
+
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+    ','      shift, and go to state 103
+
+    $default  reduce using rule 35 (t_expr)
+
+    bin_op  go to state 92
+
+
+State 96
+
+   23 statement: location ASSIGNOP expr . SEMICOL
+   43 expr: expr . bin_op expr
+
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+    SEMICOL  shift, and go to state 104
+
+    bin_op  go to state 92
+
+
+State 97
+
+   39 location: ID OBRACK expr CBRACK .
+
+    $default  reduce using rule 39 (location)
+
+
+State 98
+
+   27 statement: FOR ID '=' expr . ',' expr block
+   43 expr: expr . bin_op expr
+
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+    ','      shift, and go to state 105
+
+    bin_op  go to state 92
+
+
+State 99
+
+   25 statement: IF OPAR expr CPAR . block
+   26          | IF OPAR expr CPAR . block ELSE block
+
+    OBRACK  shift, and go to state 35
+
+    block  go to state 106
+
+
+State 100
+
+   46 expr: OPAR expr CPAR .
+
+    $default  reduce using rule 46 (expr)
+
+
+State 101
+
+   43 expr: expr . bin_op expr
+   43     | expr bin_op expr .
+
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+
+    ARITHOP   [reduce using rule 43 (expr)]
+    RELOP     [reduce using rule 43 (expr)]
+    EQOP      [reduce using rule 43 (expr)]
+    CONDOP    [reduce using rule 43 (expr)]
+    $default  reduce using rule 43 (expr)
+
+    bin_op  go to state 92
+
+
+State 102
+
+   33 method_call: method_name OPAR t_expr CPAR .
+
+    $default  reduce using rule 33 (method_call)
+
+
+State 103
+
+   36 t_expr: expr ',' . t_expr
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    t_expr       go to state 107
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 95
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 104
+
+   23 statement: location ASSIGNOP expr SEMICOL .
+
+    $default  reduce using rule 23 (statement)
+
+
+State 105
+
+   27 statement: FOR ID '=' expr ',' . expr block
+
+    OPAR     shift, and go to state 65
+    ID       shift, and go to state 51
+    BOOL     shift, and go to state 66
+    DEC      shift, and go to state 19
+    HEX      shift, and go to state 20
+    CHARLIT  shift, and go to state 67
+    '-'      shift, and go to state 69
+    '!'      shift, and go to state 70
+
+    method_call  go to state 71
+    method_name  go to state 60
+    location     go to state 72
+    expr         go to state 108
+    literal      go to state 74
+    int_literal  go to state 75
+
+
+State 106
+
+   25 statement: IF OPAR expr CPAR block .
+   26          | IF OPAR expr CPAR block . ELSE block
+
+    ELSE  shift, and go to state 109
+
+    $default  reduce using rule 25 (statement)
+
+
+State 107
+
+   36 t_expr: expr ',' t_expr .
+
+    $default  reduce using rule 36 (t_expr)
+
+
+State 108
+
+   27 statement: FOR ID '=' expr ',' expr . block
+   43 expr: expr . bin_op expr
+
+    OBRACK   shift, and go to state 35
+    ARITHOP  shift, and go to state 87
+    RELOP    shift, and go to state 88
+    EQOP     shift, and go to state 89
+    CONDOP   shift, and go to state 90
+
+    block   go to state 110
+    bin_op  go to state 92
+
+
+State 109
+
+   26 statement: IF OPAR expr CPAR block ELSE . block
+
+    OBRACK  shift, and go to state 35
+
+    block  go to state 111
+
+
+State 110
+
+   27 statement: FOR ID '=' expr ',' expr block .
+
+    $default  reduce using rule 27 (statement)
+
+
+State 111
+
+   26 statement: IF OPAR expr CPAR block ELSE block .
+
+    $default  reduce using rule 26 (statement)

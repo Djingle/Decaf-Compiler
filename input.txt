@@ -1,0 +1,12 @@
+class Program {
+    int test;
+
+    int f(int oui) {
+        return 3;
+    }
+
+    void main() {
+        compteur = 3;
+        diviseur = f(compteur);
+    }
+}
