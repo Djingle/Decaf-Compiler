@@ -12,17 +12,15 @@ CPAR ")"
 OSBRACK "["
 CSBRACK "]"
 ARITHOP "+"|"-"|"*"|"/"|"%"
-RELOP "<="|">="|"<"|">"
-EQOP "=="|"!="
-TYPE "int"|"boolean"
 ASSIGNOP "="|"+="|"-="
-CONDOP "&&"|"||"
+TYPE "int"|"boolean"
 ID [a-zA-Z][a-zA-Z0-9]*
 HEX_DIG [0-9a-fA-F]
 DIG [0-9]
 CHAR [a-zA-Z]
 
 %%
+" "                     {}
 \/\/[^\n\r]*"\n"        {}
 "class Program"         {return CLASSPRO;}
  /*"WriteInt"			    {return WRITEINT;}
@@ -35,12 +33,18 @@ CHAR [a-zA-Z]
 {CPAR}                  {return CPAR;}
 {OSBRACK}               {return OSBRACK;}
 {CSBRACK}               {return CSBRACK;}
-{ARITHOP}               {return ARITHOP;}
-{RELOP}                 {return RELOP;}
-{EQOP}                  {return EQOP;}
-{TYPE}                  {return TYPE;}
+{ARITHOP}               {return yytext[0];}
+"<="                    {return INFEG;}
+">="                    {return SUPEG;}
+"<"                     {return INF;}
+">"                     {return SUP;}
+"=="                    {return EG;}
+"!="                    {return NEG;}
+"!"                     {return yytext[0];}
+"&&"                    {return AND;}
+"||"                    {return OR;}
 {ASSIGNOP}              {return ASSIGNOP;}
-{CONDOP}                {return CONDOP;}
+{TYPE}                  {return TYPE;}
 "true"|"false"          {return BOOL;}
 "0x"{HEX_DIG}{HEX_DIG}* {return HEX;}
 {DIG}{DIG}*             {return DEC;}
