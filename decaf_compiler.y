@@ -13,7 +13,7 @@ extern FILE *yyin;
 
 %start program
 
-%token OBRACK CBRACK OPAR CPAR OSBRACK CSBRACK ASSIGNOP TYPE ID CLASSPRO BOOL DEC HEX CHARLIT SEMICOL
+%token OBRACK CBRACK OPAR CPAR OSBRACK CSBRACK ASSIGNOP TYPE ID CLASSPRO BOOL DEC HEX CHARLIT SEMICOL COMMA EGAL PEGAL MEGAL MOINS
 %token VOID FOR IF ELSE RETURN BREAK CONTINUE
 %token INFEG SUPEG INF SUP EG NEG AND OR
 
@@ -41,10 +41,10 @@ methoDecl_l		: methoDecl_l method_decl									{printf("1\n");}
 				| method_decl												{printf("2\n");}
 				;
 
-field_elem 		: ID ',' field_elem											{printf("field_elem 1\n");}
-				| ID OSBRACK int_literal CSBRACK ',' field_elem				{printf("field_elem 4\n");}
-				| ID														{printf("field_elem 3\n");}
-				| ID OSBRACK int_literal CSBRACK 							{printf("field_elem 2\n");}
+field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK			{printf("tabliste\n");}
+				| ID OSBRACK int_literal CSBRACK							{printf("tabfinliste\n");}
+				| field_elem COMMA ID										{printf("varliste\n");}
+				| ID														{printf("varfinliste\n");}
 				;
 
 method_decl		: 	VOID ID OPAR t_param CPAR block							{printf("method_decl 1\n");}
@@ -53,7 +53,8 @@ method_decl		: 	VOID ID OPAR t_param CPAR block							{printf("method_decl 1\n")
 				| 	TYPE ID OPAR CPAR block									{printf("method_decl 4\n");}
 				;
 
-t_param 		: 	TYPE ID | TYPE ID ',' t_param							{printf("t_param\n");}
+t_param 		: TYPE ID
+				| t_param TYPE COMMA ID										{printf("t_param\n");}
 				;
 
 block 			: OBRACK t_varDecl t_statement CBRACK						{printf("block\n");}
@@ -63,18 +64,22 @@ t_varDecl		: /*empty*/ 												{printf("fin t_varDecl\n");}
 				| t_varDecl var_decl										{printf("t_varDecl\n");}
 				;
 
-t_statement 	: /*empty*/		 											{printf("fin t_statement\n");}
-				| t_statement statement										{printf("t_statement\n");}
+t_statement 	: statement_l												{printf("statement\n");}
+		 		| /*empty*/													{printf("fin t_statement\n");}
 				;
 
-var_decl 		: t_param SEMICOL													{printf("var_decl\n");}
+statement_l		: statement_l statement										{printf("statliste\n");}
+				| statement													{printf("finstatliste\n");}
+				;
+
+var_decl 		: t_param SEMICOL											{printf("var_decl\n");}
 				;
 
 statement 		: location ASSIGNOP expr SEMICOL							{printf("statement 1\n");}
 				| method_call SEMICOL										{printf("statement 2\n");}
 				| IF OPAR expr CPAR block									{printf("statement 3\n");}
 				| IF OPAR expr CPAR block ELSE block						{printf("statement 4\n");}
-				| FOR ID '=' expr ',' expr block							{printf("statement 5\n");}
+				| FOR ID EGAL expr COMMA expr block							{printf("statement 5\n");}
 				| RETURN SEMICOL											{printf("statement 6\n");}
 				| RETURN expr SEMICOL										{printf("statement 7\n");}
 				| BREAK SEMICOL												{printf("statement 8\n");}
@@ -82,15 +87,12 @@ statement 		: location ASSIGNOP expr SEMICOL							{printf("statement 1\n");}
 				| block														{printf("statement 10\n");}
 				;
 
-method_call 	: method_name OPAR t_expr CPAR 								{printf("method_call 1\n");}
-				| method_name OPAR CPAR										{printf("method_call 2\n");}
+method_call 	: ID OPAR t_expr CPAR 								{printf("method_call 1\n");}
+				| ID OPAR CPAR										{printf("method_call 2\n");}
 				;
 
 t_expr 			: expr 															{printf("fin t_expr\n");}
-				| expr ',' t_expr												{printf("t_expr\n");}
-				;
-
-method_name 	: ID														{printf("method_name\n");}
+				| t_expr COMMA expr												{printf("t_expr\n");}
 				;
 
 location 		: ID 															{printf("location 1\n");}
@@ -100,37 +102,22 @@ location 		: ID 															{printf("location 1\n");}
 expr 			: location 														{printf("expr 1\n");}
 				| method_call 													{printf("expr 2\n");}
 				| literal 														{printf("expr 3\n");}
-				| expr bin_op expr 												{printf("expr 4\n");}
+				| expr '+' expr													{printf("e+\n");}
+				| expr MOINS expr													{printf("e-\n");}
+				| expr '*' expr													{printf("e*\n");}
+				| expr '/' expr													{printf("e/\n");}
+				| expr '%' expr													{printf("modulo\n");}
+				| expr INFEG expr												{printf("INFEG\n");}
+				| expr SUPEG expr												{printf("SUPEG\n");}
+				| expr INF expr													{printf("INF\n");}
+				| expr SUP expr													{printf("SUP\n");}
+				| expr EG expr													{printf("EG\n");}
+				| expr NEG expr													{printf("NEG\n");}
+				| expr AND expr													{printf("AND\n");}
+				| expr OR expr													{printf("OR\n");}
 				| '-' expr														{printf("expr 5\n");}
 				| '!' expr														{printf("expr 6\n");}
 				| OPAR expr CPAR												{printf("expr 7\n");}
-				;
-
-bin_op 			: arithop 														{printf("bin_op 1\n");}
-				| relop 														{printf("bin_op 2\n");}
-				| eqop 															{printf("bin_op 3\n");}
-				| condop														{printf("bin_op 4\n");}
-				;
-
-arithop			: '+'															{printf("+\n");}
-				| '-'															{printf("-\n");}
-				| '*'															{printf("*\n");}
-				| '/'															{printf("/\n");}
-				| '%'															{printf("modulo\n");}
-				;
-
-relop 			: INFEG
-				| SUPEG
-				| INF
-				| SUP
-				;
-
-eqop 			: EG
-				| NEG
-				;
-
-condop 			: AND
-				| OR
 				;
 
 literal 		: int_literal 													{printf("literal 1\n");}
@@ -143,7 +130,7 @@ int_literal 	: DEC 															{printf("int_literal 1\n");}
 				;
 %%
 
-void yyerror (char *s) {fprintf (stderr, "%s\n", s);}
+void yyerror (char *s) {fprintf (stderr, "error on symbol \"%s\"\n", s);}
 
 int main (void) {
 	FILE *fp;

@@ -12,21 +12,24 @@ CPAR ")"
 OSBRACK "["
 CSBRACK "]"
 ARITHOP "+"|"-"|"*"|"/"|"%"
-ASSIGNOP "="|"+="|"-="
 TYPE "int"|"boolean"
-ID [a-zA-Z][a-zA-Z0-9]*
+ID [a-zA-Z][a-zA-Z0-9_]*
 HEX_DIG [0-9a-fA-F]
 DIG [0-9]
-CHAR [a-zA-Z]
+CHAR [a-zA-Z]|" "|"\n"
 
 %%
+"-"                     {return MOINS;}
+"\n"                    {}
 " "                     {}
 \/\/[^\n\r]*"\n"        {}
 "class Program"         {return CLASSPRO;}
- /*"WriteInt"			    {return WRITEINT;}
-"WriteBool"             {return WRITEBOOL;}
-"ReadInt"               {return READINT;}
-"exit"				    {return exit_command;}*/
+"WriteInt(".*");"	    {}
+"WriteString(".*")"     {}
+"WriteBool(".*");"      {}
+"ReadInt(".*");"        {}
+"exit"				    {}
+","                     {return COMMA;}
 {OBRACK}                {return OBRACK;}
 {CBRACK}                {return CBRACK;}
 {OPAR}                  {return OPAR;}
@@ -34,6 +37,9 @@ CHAR [a-zA-Z]
 {OSBRACK}               {return OSBRACK;}
 {CSBRACK}               {return CSBRACK;}
 {ARITHOP}               {return yytext[0];}
+"="                     {return EGAL;}
+"+="                    {return PEGAL;}
+"-="                    {return MEGAL;}
 "<="                    {return INFEG;}
 ">="                    {return SUPEG;}
 "<"                     {return INF;}
@@ -43,7 +49,6 @@ CHAR [a-zA-Z]
 "!"                     {return yytext[0];}
 "&&"                    {return AND;}
 "||"                    {return OR;}
-{ASSIGNOP}              {return ASSIGNOP;}
 {TYPE}                  {return TYPE;}
 "true"|"false"          {return BOOL;}
 "0x"{HEX_DIG}{HEX_DIG}* {return HEX;}
@@ -68,11 +73,11 @@ CHAR [a-zA-Z]
             printf("caractère non reconnu\n");
         }
     }
- /*\"{CHAR}*\"             {
-        memcpy(str, yytext+1, strlen(yytext)-2);
-        return STRLIT;
-    }*/
-.                       {}
+ \"{CHAR}*\"             {
+        //memcpy(str, yytext+1, strlen(yytext)-2);
+        //return STRLIT;
+    }
+.                       {/*fprintf(stderr, yytext);*/}
 
 
 

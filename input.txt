@@ -1,12 +1,34 @@
+// Exemple de programme en DECAF
 class Program {
-    int test;
+    //int compteur , diviseur;
+    //int valeurs[4] ;
+    //boolean test;
 
-    int f(int oui) {
-        return 3;
+    boolean lecture_valeurs(int nombre) // Saisie des valeurs entières
+    {
+        boolean test;
+        oui();
+        if (true) {return false;}
+        for i = 3, nombre-1 {return caca;}
+    }
+
+    int moyenne(int nombre) { // Calcul de la moyenne des valeurs
+        int somme;
+        for i = 0, nombre-1 {
+            somme += valeurs[i];
+        }
+        return somme/nombre;
     }
 
     void main() {
-        compteur = 3;
-        diviseur = f(compteur);
+        int nombre;
+        WriteString("Nombre de valeurs : ");
+        ReadInt(nombre);
+        if (lecture_valeurs(nombre)) {
+            WriteString("Moyenne = ");
+            WriteInt(moyenne(nombre));
+            WriteString("\n");
+        }
+        else { WriteString("Erreur\n"); }
     }
 }
