@@ -2,14 +2,15 @@
 #define INTERMEDIATE_CODE_H
 
 // Structures
-// Liste
+
 typedef struct quadop{
     enum quadop_type {
-        QO_CST,QO_NAME,
+        QO_CST,QO_NAME,QO_ADDRESS,QO_LABEL,QO_GOTO,QO_IF,QO_RETURN,QO_PARAM,QO_CALL,QO_READ,QO_WRITE,QO_PLUS,QO_MINUS,QO_MUL,QO_DIV,QO_EQ,QO_NE,QO_LT,QO_GT,QO_LE,QO_GE,QO_AND,QO_OR,QO_NOT,QO_NOP
     } type;
     union{
         int cst;
         char *name;
+        quad *adresse_goto;
     } u;
 }quadop;
 
@@ -22,16 +23,16 @@ typedef struct quad{
 }quad;
 
 typedef struct List {
-    quad first;
-    quad last;
+    quad *first;
+    quad *last;
     int size;
 } List;
-typedef struct List Liste;
+typedef struct List* Liste;
 
 // Functions
-Liste crelist(quad adresse);
+Liste crelist(quad* adresse);
 Liste concat(Liste l1, Liste l2);
-void complete(Liste l,quad adresse);
+void complete(Liste l,quad* adresse);
 void gencode();
 void newtemp();
 
