@@ -1,5 +1,7 @@
 #ifndef INTERMEDIATE_CODE_H
 #define INTERMEDIATE_CODE_H
+#include <stdio.h>
+#include <stdlib.h>
 
 // Structures
 
@@ -10,30 +12,42 @@ typedef struct quadop{
     union{
         int cst;
         char *name;
-        quad *adresse_goto;
+        // quad *adresse_goto;
     } u;
-}quadop;
+}quadop,*Quadop;
 
-typedef struct quad{
+
+typedef struct quad quad;
+struct quad{
     enum quad_type {
         Q_ASSIGN,Q_ADD,Q_SUB,Q_MUL,Q_DIV,Q_MOD,Q_EQ,Q_NE,Q_LT,Q_GT,Q_LE,Q_GE,Q_AND,Q_OR,Q_NOT,Q_RETURN,Q_GOTO,Q_IF,Q_CALL,Q_PARAM,Q_READ,Q_WRITE,
     } type;
-    quadop op1,op2,op3;
+    Quadop op1,op2,op3;
     quad *next;
-}quad;
+};
+typedef quad* Quadruplet;
 
-typedef struct List {
-    quad *first;
-    quad *last;
+typedef struct list {
+    Quadruplet first;
+    Quadruplet last;
     int size;
-} List;
-typedef struct List* Liste;
+} list, *Liste;
+
 
 // Functions
-Liste crelist(quad* adresse);
+Quadop create_quadopInt(enum quadop_type type, int cst);
+Quadop create_quadopString(enum quadop_type type, char *name);
+
+Quadruplet createQuad(enum quad_type type, Quadop op1, Quadop op2, Quadop res);
+void printQuad(Quadruplet q);
+
+Liste crelist(Quadruplet adresse);
+void printList(Liste l);
+Liste push(Liste l, Quadruplet adresse);
 Liste concat(Liste l1, Liste l2);
-void complete(Liste l,quad* adresse);
+void complete(Liste l,Quadruplet adresse);
+
 void gencode();
-void newtemp();
+Quadop newtemp();
 
 #endif  
