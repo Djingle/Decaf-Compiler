@@ -7,20 +7,21 @@ int symbols[52];
 int symbolVal(char symbol);
 void updateSymbolVal(char symbol, int val);
 extern FILE *yyin;
-//int yydebug = 1;
+int yydebug = 1;
 
 %}
 
 %start program
 
-%token OBRACK CBRACK OPAR CPAR OSBRACK CSBRACK ASSIGNOP TYPE ID CLASSPRO BOOL DEC HEX CHARLIT SEMICOL COMMA EGAL PEGAL MEGAL MOINS
+%token OBRACK CBRACK OPAR CPAR OSBRACK CSBRACK TYPE ID CLASSPRO BOOL DEC HEX CHARLIT SEMICOL COMMA
+%token EGAL PEGAL MEGAL MOINS PLUS FOIS DIVISER MODULO NON
 %token VOID FOR IF ELSE RETURN BREAK CONTINUE
-%token INFEG SUPEG INF SUP EG NEG AND OR
+%token INFEG SUPEG INF SUP B_EGAL B_NEGAL AND OR
 
-%left '+' '-'
-%left '*' '/' '%'
-%nonassoc '!'
-%nonassoc INFEG SUPEG INF SUP EG NEG
+%left PLUS MOINS
+%left FOIS DIVISER MODULO
+%nonassoc NON
+%nonassoc INFEG SUPEG INF SUP B_EGAL B_NEGAL
 %left AND OR
 
 
@@ -29,16 +30,16 @@ extern FILE *yyin;
 program   		: CLASSPRO OBRACK t_fielDecl t_methoDecl CBRACK				{printf("program\n");}
 				;
 
-t_fielDecl  	: /*empty*/													{printf("fin t_fielDecl\n");}
-				| t_fielDecl TYPE field_elem SEMICOL						{printf("t_fielDecl\n");}
+t_fielDecl		: t_fielDecl TYPE field_elem SEMICOL						{printf("t_fielDecl\n");}
+				| /*empty*/													{}
 				;
 
-t_methoDecl 	: /*empty*/													{printf("fin t_methoDecl\n");}
-				| methoDecl_l												{printf("t_methoDecl\n");}
+t_methoDecl 	: methoDecl_l												{printf("t_methoDecl\n");}
+				| /*empty*/													{}
 				;
 
-methoDecl_l		: methoDecl_l method_decl									{printf("1\n");}
-				| method_decl												{printf("2\n");}
+methoDecl_l		: methoDecl_l method_decl									{printf("method\n");}
+				| method_decl												{printf("method\n");}
 				;
 
 field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK			{printf("tabliste\n");}
@@ -53,15 +54,23 @@ method_decl		: 	VOID ID OPAR t_param CPAR block							{printf("method_decl 1\n")
 				| 	TYPE ID OPAR CPAR block									{printf("method_decl 4\n");}
 				;
 
-t_param 		: TYPE ID
-				| t_param TYPE COMMA ID										{printf("t_param\n");}
+t_param 		: TYPE ID													{printf("param\n");}
+				| t_param COMMA TYPE ID										{printf("t_param\n");}
 				;
 
 block 			: OBRACK t_varDecl t_statement CBRACK						{printf("block\n");}
 				;
 
-t_varDecl		: /*empty*/ 												{printf("fin t_varDecl\n");}
-				| t_varDecl var_decl										{printf("t_varDecl\n");}
+t_varDecl		: var_decl_l												{printf("t_varDecl\n");}
+				| /*empty*/ 												{}
+				;
+
+var_decl_l		: var_decl_l TYPE var_elem SEMICOL							{printf("vardecliste\n");}
+				| TYPE var_elem SEMICOL										{printf("finvardecliste\n");}
+				;
+
+var_elem		: ID														{printf("finvarliste\n");}
+				| var_elem COMMA ID											{printf("varliste\n");}
 				;
 
 t_statement 	: statement_l												{printf("statement\n");}
@@ -72,10 +81,10 @@ statement_l		: statement_l statement										{printf("statliste\n");}
 				| statement													{printf("finstatliste\n");}
 				;
 
-var_decl 		: t_param SEMICOL											{printf("var_decl\n");}
-				;
 
-statement 		: location ASSIGNOP expr SEMICOL							{printf("statement 1\n");}
+statement 		: location EGAL expr SEMICOL								{printf("statement 1a\n");}
+				| location PEGAL expr SEMICOL								{printf("statement 1b\n");}
+				| location MEGAL expr SEMICOL								{printf("statement 1b\n");}
 				| method_call SEMICOL										{printf("statement 2\n");}
 				| IF OPAR expr CPAR block									{printf("statement 3\n");}
 				| IF OPAR expr CPAR block ELSE block						{printf("statement 4\n");}
@@ -87,8 +96,8 @@ statement 		: location ASSIGNOP expr SEMICOL							{printf("statement 1\n");}
 				| block														{printf("statement 10\n");}
 				;
 
-method_call 	: ID OPAR t_expr CPAR 								{printf("method_call 1\n");}
-				| ID OPAR CPAR										{printf("method_call 2\n");}
+method_call 	: ID OPAR t_expr CPAR 										{printf("method_call 1\n");}
+				| ID OPAR CPAR												{printf("method_call 2\n");}
 				;
 
 t_expr 			: expr 															{printf("fin t_expr\n");}
@@ -102,21 +111,21 @@ location 		: ID 															{printf("location 1\n");}
 expr 			: location 														{printf("expr 1\n");}
 				| method_call 													{printf("expr 2\n");}
 				| literal 														{printf("expr 3\n");}
-				| expr '+' expr													{printf("e+\n");}
-				| expr MOINS expr													{printf("e-\n");}
-				| expr '*' expr													{printf("e*\n");}
-				| expr '/' expr													{printf("e/\n");}
-				| expr '%' expr													{printf("modulo\n");}
+				| expr PLUS expr												{printf("e+\n");}
+				| expr MOINS expr												{printf("e-\n");}
+				| expr FOIS expr												{printf("e*\n");}
+				| expr DIVISER expr												{printf("e/\n");}
+				| expr MODULO expr												{printf("modulo\n");}
 				| expr INFEG expr												{printf("INFEG\n");}
 				| expr SUPEG expr												{printf("SUPEG\n");}
 				| expr INF expr													{printf("INF\n");}
 				| expr SUP expr													{printf("SUP\n");}
-				| expr EG expr													{printf("EG\n");}
-				| expr NEG expr													{printf("NEG\n");}
+				| expr B_EGAL expr												{printf("EG\n");}
+				| expr B_NEGAL expr												{printf("NEG\n");}
 				| expr AND expr													{printf("AND\n");}
 				| expr OR expr													{printf("OR\n");}
-				| '-' expr														{printf("expr 5\n");}
-				| '!' expr														{printf("expr 6\n");}
+				| MOINS expr														{printf("expr 5\n");}
+				| NON expr														{printf("expr 6\n");}
 				| OPAR expr CPAR												{printf("expr 7\n");}
 				;
 

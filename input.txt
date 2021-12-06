@@ -4,31 +4,35 @@ class Program {
     //int valeurs[4] ;
     //boolean test;
 
-    boolean lecture_valeurs(int nombre) // Saisie des valeurs entières
-    {
-        boolean test;
-        oui();
-        if (true) {return false;}
-        for i = 3, nombre-1 {return caca;}
-    }
+    //boolean lecture_valeurs(int nombre) // Saisie des valeurs entières
+    //{
+    //    boolean oui;
+    //    oui();
+    //    if (true) {
+    //        return false;
+    //    }
+    //    else { return true; }
+    //    for i = 3, nombre-1 {return caca;}
+    //}
 
-    int moyenne(int nombre) { // Calcul de la moyenne des valeurs
-        int somme;
-        for i = 0, nombre-1 {
-            somme += valeurs[i];
-        }
-        return somme/nombre;
-    }
+    //int moyenne(int nombre) { // Calcul de la moyenne des valeurs
+    //    int somme;
+    //    for i = 0, nombre-1 {
+    //        somme += valeurs[i];
+    //    }
+    //    return somme/nombre;
+    //}
 
     void main() {
-        int nombre;
-        WriteString("Nombre de valeurs : ");
-        ReadInt(nombre);
-        if (lecture_valeurs(nombre)) {
-            WriteString("Moyenne = ");
-            WriteInt(moyenne(nombre));
-            WriteString("\n");
+        int nombre, non, oui;
+        //WriteString("Nombre de valeurs : ");
+        //ReadInt(nombre);
+        if (lecture_valeurs(bonjour)) {
+            //WriteString("Moyenne = ");
+            //WriteInt(moyenne(nombre));
+            //WriteString("\n");
+            oui();
         }
-        else { WriteString("Erreur\n"); }
+        else { non(); }
     }
 }
