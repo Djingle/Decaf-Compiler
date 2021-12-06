@@ -1,24 +1,24 @@
 #ifndef SYMBOLS_TABLE_H
 #define SYMBOLS_TABLE_H
 
+#include <stdio.h>
+#include"intermediate_code.h"
 typedef struct entry{
-    char *name;
-    int type;
-    int value;
+    quadop *variable;
     struct entry *next;
 } Symbole;
 
 typedef struct context{
-    Entree *entries;
+    Symbole *entries;
     struct context *parent;
 } Contexte;
 
 Contexte *pile = NULL; 
 
-pushctx();
-popctx();
+void pushctx();
+void popctx();
 Contexte *currentctx();
-Entree *newname(char *name);//faut peut etre ajouter type et valeur en param?
-Entree* lookup(char *name);
+Symbole *newname(char *name);//faut peut etre ajouter type et valeur en param?
+Symbole* lookup(char *name);
 
 #endif

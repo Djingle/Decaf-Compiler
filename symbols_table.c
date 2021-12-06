@@ -15,19 +15,22 @@ void popctx(){
 Contexte *currentctx(){
     return pile;
 }
-Entree *newname(char *name){
-    Entree *newEntree = (Entree*)malloc(sizeof(Entree));
+Symbole *newname(char *name){
+    Symbole *newEntree = (Symbole*)malloc(sizeof(Symbole));
     newEntree->next = pile->entries;
-    strcpy(newEntree->name, name);
+    quadop *q = (quadop *)malloc(sizeof(quadop));
+    strcpy(q->u.name, name);
+    q->type = QO_NAME;
+    newEntree->variable = q;
     pile->entries = newEntree;
     return newEntree;
 }
-Entree* lookup(char *name){
+Symbole* lookup(char *name){
     if(pile == NULL)
         return NULL;
-    Entree *compteur = pile->entries;
+    Symbole *compteur = pile->entries;
     while(compteur){
-        if(!strcmp(compteur->name, name))
+        if(!strcmp(compteur->variable->u.name, name))
             return compteur;
         compteur = compteur->next;
     }
