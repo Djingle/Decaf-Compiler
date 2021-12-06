@@ -11,7 +11,6 @@ OPAR "("
 CPAR ")"
 OSBRACK "["
 CSBRACK "]"
-ARITHOP "+"|"-"|"*"|"/"|"%"
 TYPE "int"|"boolean"
 ID [a-zA-Z][a-zA-Z0-9_]*
 HEX_DIG [0-9a-fA-F]
@@ -19,7 +18,6 @@ DIG [0-9]
 CHAR [a-zA-Z]|" "|"\n"
 
 %%
-"-"                     {return MOINS;}
 "\n"                    {}
 " "                     {}
 \/\/[^\n\r]*"\n"        {}
@@ -36,7 +34,11 @@ CHAR [a-zA-Z]|" "|"\n"
 {CPAR}                  {return CPAR;}
 {OSBRACK}               {return OSBRACK;}
 {CSBRACK}               {return CSBRACK;}
-{ARITHOP}               {return yytext[0];}
+"-"                     {return MOINS;}
+"+"                     {return PLUS;}
+"*"                     {return FOIS;}
+"/"                     {return DIVISER;}
+"%"                     {return MODULO;}
 "="                     {return EGAL;}
 "+="                    {return PEGAL;}
 "-="                    {return MEGAL;}
@@ -44,9 +46,9 @@ CHAR [a-zA-Z]|" "|"\n"
 ">="                    {return SUPEG;}
 "<"                     {return INF;}
 ">"                     {return SUP;}
-"=="                    {return EG;}
-"!="                    {return NEG;}
-"!"                     {return yytext[0];}
+"=="                    {return B_EGAL;}
+"!="                    {return B_NEGAL;}
+"!"                     {return NON;}
 "&&"                    {return AND;}
 "||"                    {return OR;}
 {TYPE}                  {return TYPE;}
