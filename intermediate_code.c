@@ -1,4 +1,5 @@
 #include "intermediate_code.h"
+#include "symbols_table.h"
 Liste globalCode = NULL;
 size_t nextquad;
 
@@ -91,9 +92,9 @@ void gencode(Quadruplet instruction_3_adresses){
     push(globalCode,instruction_3_adresses);
     nextquad++;
 }
-// quadop newtemp(){
-    
-// }
+quadop *newtemp(){
+    return newname("name")->variable;// je sais pas quoi mettre comme nom variable temporaire
+}
 
 int main(){
     //display on the terminal a text
