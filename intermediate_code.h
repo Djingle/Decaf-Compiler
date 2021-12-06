@@ -12,10 +12,11 @@ typedef struct quadop{
     union{
         int cst;
         char *name;
+        *ptrSymbol adress;
         // quad *adresse_goto;
     } u;
 }quadop,*Quadop;
-
+// (ADD 2 3)
 
 typedef struct quad quad;
 struct quad{
