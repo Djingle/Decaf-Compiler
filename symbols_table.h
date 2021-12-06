@@ -6,7 +6,7 @@ typedef struct entry{
     int type;
     int value;
     struct entry *next;
-} Entree;
+} Symbole;
 
 typedef struct context{
     Entree *entries;
