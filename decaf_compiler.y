@@ -3,13 +3,33 @@ void yyerror (char *s);
 int yylex();
 #include <stdio.h>     /* C declarations used in actions */
 #include <stdlib.h>
+#include "intermediate_code.h"
 int symbols[52];
 int symbolVal(char symbol);
 void updateSymbolVal(char symbol, int val);
 extern FILE *yyin;
 int yydebug = 1;
+Quadruplet nextquad = 0;
 
 %}
+
+%union {
+	int intval;
+	char * strval;
+	struct {
+		Liste true;
+		Liste false;
+		quadop result;
+	} exprval;
+	struct {
+		Liste next;
+	} gt;
+	Quadruplet mr;
+}
+
+%type <exprval> expr
+%type <gt> g statement
+%type <mr> m
 
 %start program
 
@@ -86,8 +106,17 @@ statement 		: location EGAL expr SEMICOL								{printf("statement 1a\n");}
 				| location PEGAL expr SEMICOL								{printf("statement 1b\n");}
 				| location MEGAL expr SEMICOL								{printf("statement 1b\n");}
 				| method_call SEMICOL										{printf("statement 2\n");}
-				| IF OPAR expr CPAR block									{printf("statement 3\n");}
-				| IF OPAR expr CPAR block ELSE block						{printf("statement 4\n");}
+
+				| IF OPAR expr CPAR m block									{
+																				complete($3.true, $5);
+																				$$.next = concat($3.false, $6.next);
+																			}
+				| IF OPAR expr CPAR m block g ELSE m block					{
+																				complete($3.true, $5);
+																			 	complete($3.false, $9);
+																			 	$$.next = concat($6.next, concat($7.next, $10.next))
+																			}
+				
 				| FOR ID EGAL expr COMMA expr block							{printf("statement 5\n");}
 				| RETURN SEMICOL											{printf("statement 6\n");}
 				| RETURN expr SEMICOL										{printf("statement 7\n");}
@@ -116,27 +145,58 @@ expr 			: location 														{printf("expr 1\n");}
 				| expr FOIS expr												{printf("e*\n");}
 				| expr DIVISER expr												{printf("e/\n");}
 				| expr MODULO expr												{printf("modulo\n");}
+				| MOINS expr													{printf("expr 5\n");}
+
 				| expr INFEG expr												{printf("INFEG\n");}
 				| expr SUPEG expr												{printf("SUPEG\n");}
 				| expr INF expr													{printf("INF\n");}
 				| expr SUP expr													{printf("SUP\n");}
 				| expr B_EGAL expr												{printf("EG\n");}
 				| expr B_NEGAL expr												{printf("NEG\n");}
-				| expr AND expr													{printf("AND\n");}
-				| expr OR expr													{printf("OR\n");}
-				| MOINS expr														{printf("expr 5\n");}
-				| NON expr														{printf("expr 6\n");}
-				| OPAR expr CPAR												{printf("expr 7\n");}
+				
+				| expr AND m expr												{
+																					complete($1.true, $3);
+																					$$.false = concat($1.false, $4.false);
+																					$$.true = $4.true;
+																				}
+				| expr OR m expr												{
+																					complete($1.false, $3);
+																					$$.true = concat($1.true, $4.true);
+																					$$.false = $4.false;
+																				}
+				| NON expr														{
+																					$$.true = $2.false;
+																					$$.false = $2.true;
+																				}
+				| OPAR expr CPAR												{
+																					$$ = $2;
+																				}
 				;
+
+
 
 literal 		: int_literal 													{printf("literal 1\n");}
 				| BOOL															{printf("literal 3\n");}
 				| CHARLIT	 													{printf("literal 2\n");}
 				;
 
+
 int_literal 	: DEC 															{printf("int_literal 1\n");}
 				| HEX															{printf("int_literal 2\n");}
 				;
+
+g			: /*empty*/ {
+							$$.next = creelist(nextquad);
+							Quadop op1 = createQuadop(QO_GOTO, NULL);
+							Quadruplet new = createQuad(Q_GOTO, op1, NULL, NULL);
+							gencode(new);
+						}
+			;
+
+m			: /*empty*/ {
+							$$ = nextquad;
+						}
+			;
 %%
 
 void yyerror (char *s) {fprintf (stderr, "error on symbol \"%s\"\n", s);}

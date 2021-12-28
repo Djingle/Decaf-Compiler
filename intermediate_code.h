@@ -9,12 +9,12 @@ typedef struct quadop{
     enum quadop_type {
         QO_CST,QO_NAME,QO_ADDRESS,QO_LABEL,QO_GOTO,QO_IF,QO_RETURN,QO_PARAM,QO_CALL,QO_READ,QO_WRITE,QO_PLUS,QO_MINUS,QO_MUL,QO_DIV,QO_EQ,QO_NE,QO_LT,QO_GT,QO_LE,QO_GE,QO_AND,QO_OR,QO_NOT,QO_NOP
     } type;
-    union{
+    union u{
         int cst;
         char *name;
-        *ptrSymbol adress;
-        // quad *adresse_goto;
-    } u;
+        // *ptrSymbol adress;
+        Quadruplet adresse_goto;
+    };
 }quadop,*Quadop;
 // (ADD 2 3)
 
@@ -36,9 +36,7 @@ typedef struct list {
 
 
 // Functions
-Quadop create_quadopInt(enum quadop_type type, int cst);
-Quadop create_quadopString(enum quadop_type type, char *name);
-
+Quadop createQuadop(enum quadop_type type, union u value);
 Quadruplet createQuad(enum quad_type type, Quadop op1, Quadop op2, Quadop res);
 void printQuad(Quadruplet q);
 

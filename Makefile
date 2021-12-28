@@ -5,7 +5,7 @@ all: y.tab.o lex.yy.o
 
 y.tab.o: $(prefixe).y
 	yacc -v -d $(prefixe).y
-	gcc -c y.tab.c compiler.c
+	gcc -c y.tab.c
 
 lex.yy.o: $(prefixe).l y.tab.h
 	lex $(prefixe).l
