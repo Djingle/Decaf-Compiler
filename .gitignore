@@ -5,3 +5,4 @@ y.output
 lex.yy.c
 lex.yy.o
 y.tab.o
+intermediate_code.o

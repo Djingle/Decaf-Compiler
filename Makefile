@@ -12,8 +12,9 @@ lex.yy.o: $(prefixe).l y.tab.h
 	lex $(prefixe).l
 	gcc -c lex.yy.c
 
-test: intermediate_code.h
-	gcc intermediate_code.c -o test 
+intermediate_code.o: intermediate_code.c intermediate_code.h
+	gcc -c intermediate_code.c
+
 
 clean:
 	rm -f *.o y.tab.c y.tab.h lex.yy.c a.out y.output test $(prefixe)

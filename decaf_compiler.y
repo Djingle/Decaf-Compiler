@@ -156,14 +156,14 @@ expr 			: location 						{printf("expr 1\n");}
 				| expr INFEG expr				{
 												// Instanciation of test quad
 												$$.true = crelist(nextquad);
-												Quadop gt = createQuadop(QO_GOTO, (u)NULL);
+												Quadop gt = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
 												Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 												Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 												Quadruplet new = createQuad(Q_LE, op1, op2, gt);
 												gencode(new);
 												// Instanciation of goto quad
 												$$.false = crelist(nextquad);
-												gt = createQuadop(QO_GOTO, (u)NULL);
+												gt = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
 												new = createQuad(Q_GOTO, gt, NULL, NULL);
 												gencode(new);
 												// À TESTER AVANT D'IMPLÉMENTER LES AUTRES (MÊME BAIL, JUSTE LE TYPE DE QUAD QUI CHANGE)
@@ -207,7 +207,7 @@ int_literal 	: DEC 							{printf("int_literal 1\n");}
 
 g			: /*empty*/ 						{
 												$$.next = crelist(nextquad);
-												Quadop op1 = createQuadop(QO_GOTO, (u)NULL);
+												Quadop op1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
 												Quadruplet new = createQuad(Q_GOTO, op1, NULL, NULL);
 												gencode(new);
 												}
