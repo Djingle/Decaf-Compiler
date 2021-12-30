@@ -1,5 +1,6 @@
 %{
-extern int yylval;
+//extern int yylval;
+#include "intermediate_code.h"
 #include "y.tab.h"
 void yyerror (char *s);
 int yylex();
@@ -66,14 +67,14 @@ CHAR [a-zA-Z]|" "|"\n"
 {ID}                    {return ID;}
 
 \'{CHAR}\'              {
-        int temp = yytext[0];
-        if (temp >= 32 && temp<=126) {
-            yylval = temp;
-            return CHARLIT;
-        }
-        else {
-            printf("caractère non reconnu\n");
-        }
+        // int temp = yytext[0];
+        // if (temp >= 32 && temp<=126) {
+        //     yylval.intval = temp;
+        //     return CHARLIT;
+        // }
+        // else {
+        //     printf("caractère non reconnu\n");
+        // }
     }
  \"{CHAR}*\"             {
         //memcpy(str, yytext+1, strlen(yytext)-2);

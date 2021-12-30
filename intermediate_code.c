@@ -1,12 +1,10 @@
 #include "intermediate_code.h"
 #include "symbols_table.h"
-Liste globalCode = NULL;
-size_t nextquad;
 
 Quadop createQuadop(enum quadop_type type,union u value){
     Quadop q = (Quadop)malloc(sizeof(quadop));
     q->type = type;
-    q->u = value;
+    q->value = value;
     return q;
 }
 Quadruplet createQuad(enum quad_type type, Quadop op1, Quadop op2, Quadop res){
@@ -81,30 +79,26 @@ void printQuad(Quadruplet q){
     // }
 // }
 
-void gencode(Quadruplet instruction_3_adresses){
-    switch(instruction_3_adresses->type)
-    push(globalCode,instruction_3_adresses);
-    nextquad++;
-}
-quadop *newtemp(){
-    return newname("name")->variable;// je sais pas quoi mettre comme nom variable temporaire
+void gencode(Liste liste, Quadruplet new, Quadruplet nextquad){
+    push(liste, new);
+    nextquad = new->next;
 }
 
 // int main(){
 //     //display on the terminal a text
 //     printf("Hello World\n");
 
-//     Quadop op1 = create_quadopInt(QO_CST,1);
-//     Quadop op2 = create_quadopInt(QO_CST,2);
-//     Quadop op3 = create_quadopInt(QO_CST,3);
-//     Quadop op4 = create_quadopString(QO_NAME,"test");
-//     Quadop op5 = create_quadopString(QO_NAME,"test2");
-//     Quadop op6 = create_quadopString(QO_NAME,"test3");
+//     Quadop op1 = createQuadop(QO_CST, (u)3);
+//     Quadop op2 = createQuadop(QO_CST, (u)5);
+//     Quadop op3 = createQuadop(QO_CST, (u)NULL);
+//     Quadop op4 = createQuadop(QO_CST, (u)3);
+//     Quadop op5 = createQuadop(QO_CST, (u)3);
+//     Quadop op6 = createQuadop(QO_CST, (u)3);
 
 //     //display another text
 //     printf("Middle 1 World\n");
 //     Quadruplet q1 = createQuad(Q_ADD,op1,op2,op3);
-//     Quadruplet q2 = createQuad(Q_IF,op3,op4,op5);
+//     Quadruplet q2 = createQuad(Q_SUB,op3,op4,op5);
 //     Quadruplet q3 = createQuad(Q_MUL,op4,op5,op6);
 //     printf("Middle 2 World\n");
 //     Liste l = crelist(q1);

@@ -1,9 +1,10 @@
 prefixe=decaf_compiler
 
-all: y.tab.o lex.yy.o
-	gcc y.tab.o lex.yy.o -lfl -o $(prefixe)
+all: y.tab.o lex.yy.o intermediate_code.o
+	gcc y.tab.o lex.yy.o intermediate_code.o -lfl -o $(prefixe)
 
-y.tab.o: $(prefixe).y
+
+y.tab.o: $(prefixe).y intermediate_code.h
 	yacc -v -d $(prefixe).y
 	gcc -c y.tab.c
 
