@@ -4,8 +4,11 @@
 #include <stdlib.h>
 
 // Structures
+typedef union u u;
 typedef struct quad quad;
 typedef quad* Quadruplet;
+
+// Enums
 typedef enum quadop_type {
     QO_CST,QO_NAME,QO_ADDRESS,QO_LABEL,QO_GOTO,QO_IF,QO_RETURN,QO_PARAM,
     QO_CALL,QO_READ,QO_WRITE,QO_PLUS,QO_MINUS,QO_MUL,QO_DIV,QO_EQ,QO_NE,
@@ -19,14 +22,13 @@ typedef enum quad_type {
 //QO_GOTOI stands for goto incomplete
 typedef struct quadop{
     quadop_type type;
-    union u{
+    union u {
         int cst;
         char *name;
         Quadruplet adresse_goto;
     } value;
 }quadop,*Quadop;
 
-typedef union u u;
 
 struct quad{
     quad_type type;
@@ -47,7 +49,8 @@ Quadop createQuadop(enum quadop_type type, union u value);
 Quadruplet createQuad(enum quad_type type, Quadop op1, Quadop op2, Quadop res);
 void printQuad(Quadruplet q);
 
-Liste crelist();
+Liste initList();
+Liste crelist(Quadruplet adresse);
 void printList(Liste l);
 Liste push(Liste l, Quadruplet adresse);
 Liste concat(Liste l1, Liste l2);

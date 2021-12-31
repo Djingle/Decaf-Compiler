@@ -9,8 +9,8 @@ int symbolVal(char symbol);
 void updateSymbolVal(char symbol, int val);
 extern FILE *yyin;
 int yydebug = 1;
+Quadruplet nextquad = NULL;
 Liste globalCode = NULL;
-Quadruplet nextquad = 0;
 
 %}
 
@@ -219,9 +219,17 @@ m			: /*empty*/ 						{
 			;
 %%
 
+
 void yyerror (char *s) {fprintf (stderr, "error on symbol \"%s\"\n", s);}
 
+void gencode(Quadruplet new)
+{
+	push(globalCode, new);
+	nextquad = new->next;
+}
+
 int main (void) {
+	globalCode = initList();
 	FILE *fp;
 	fp = fopen("input.txt", "r");
 	yyin = fp;

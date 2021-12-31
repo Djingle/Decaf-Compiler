@@ -1,7 +1,7 @@
 #include "intermediate_code.h"
 #include "symbols_table.h"
 
-Quadop createQuadop(enum quadop_type type,union u value){
+Quadop createQuadop(enum quadop_type type,u value){
     Quadop q = (Quadop)malloc(sizeof(quadop));
     q->type = type;
     q->value = value;
@@ -17,9 +17,19 @@ Quadruplet createQuad(enum quad_type type, Quadop op1, Quadop op2, Quadop res){
     return q;
 }
  
+Liste initList()
+{
+    Liste l = (Liste)malloc(sizeof(list));
+    if (l == NULL) {printf("malloc failed\n"); exit(EXIT_FAILURE);}
+    l->first = NULL;
+    l->last = NULL;
+    l->size = 0;
+    return l;
+}
+
 Liste crelist(Quadruplet adresse){
-    Liste liste;
-    liste = (Liste)malloc(sizeof(list));
+    Liste liste = (Liste)malloc(sizeof(list));
+    if (liste == NULL) {printf("malloc failed\n"); exit(EXIT_FAILURE);}
     liste->first = adresse;
     liste->last = adresse;
     liste->size = 1;
@@ -27,8 +37,10 @@ Liste crelist(Quadruplet adresse){
 }
 
 Liste push(Liste liste,Quadruplet adresse){
-    if(liste == NULL){
-        liste = crelist(adresse);
+    if(liste->first == NULL) {
+        liste->first = adresse;
+        liste->last = adresse;
+        liste->size++;
     }
     else{
         liste->last->next = adresse;
@@ -38,6 +50,8 @@ Liste push(Liste liste,Quadruplet adresse){
     return liste;
 }
 Liste concat(Liste liste1, Liste liste2){
+    if (liste1 == NULL) return liste2;
+    if (liste2 == NULL) return liste1;
     Liste liste;
     liste1->last->next = liste2->first;
     liste->first = liste1->first;
@@ -84,6 +98,10 @@ void printQuad(Quadruplet q)
     }
 }
 Liste complete(Liste l,Quadruplet adresse){
+    printf("ouioui\n");
+    int compteur;
+    printList(l);
+    if (l==NULL) return l;
     Quadruplet save = l->first;
     int c = 0;
     while(save != NULL){
@@ -108,11 +126,6 @@ Liste complete(Liste l,Quadruplet adresse){
         c++;
     }
     return l;
-}
-
-void gencode(Liste liste, Quadruplet new, Quadruplet nextquad){
-    push(liste, new);
-    nextquad = new->next;
 }
 
 // int main(){
