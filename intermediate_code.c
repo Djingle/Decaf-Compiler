@@ -37,7 +37,7 @@ Liste crelist(Quadruplet adresse){
 }
 
 Liste push(Liste liste,Quadruplet adresse){
-    if(liste->first == NULL) {
+    if(liste->size == 0) { // liste vide
         liste->first = adresse;
         liste->last = adresse;
         liste->size++;
@@ -50,8 +50,10 @@ Liste push(Liste liste,Quadruplet adresse){
     return liste;
 }
 Liste concat(Liste liste1, Liste liste2){
-    if (liste1 == NULL) return liste2;
-    if (liste2 == NULL) return liste1;
+    printList(liste1);
+    printList(liste2);
+    if (liste1->size == 0) return liste2;
+    if (liste2->size == 0) return liste1;
     Liste liste;
     liste1->last->next = liste2->first;
     liste->first = liste1->first;
@@ -60,7 +62,7 @@ Liste concat(Liste liste1, Liste liste2){
     return liste;
 }
 void printList(Liste liste){
-    if(liste == NULL){
+    if(liste->size == 0){
         printf("Liste vide\n");
     }
     else{
@@ -87,6 +89,11 @@ void printQuad(Quadruplet q)
             break;
         case Q_LT:
             printf("Q_LT: %d, %d ", q->op1->value.cst, q->op2->value.cst);
+            if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
+            else printf("%d\n", q->op3->type);
+            break;
+        case Q_LE:
+            printf("Q_LE: %d, %d ", q->op1->value.cst, q->op2->value.cst);
             if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
             else printf("%d\n", q->op3->type);
             break;

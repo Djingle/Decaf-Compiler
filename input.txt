@@ -1,8 +1,8 @@
 // Exemple de programme en DECAF
 class Program {
-    //int compteur , diviseur;
-    //int valeurs[4] ;
-    //boolean test;
+    int compteur , diviseur;
+    int valeurs[4] ;
+    boolean test;
 
     //boolean lecture_valeurs(int nombre) // Saisie des valeurs entières
     //{

@@ -3,6 +3,7 @@ void yyerror (char *s);
 int yylex();
 #include <stdio.h>     /* C declarations used in actions */
 #include <stdlib.h>
+#include <stdbool.h>
 #include "intermediate_code.h"
 int symbols[52];
 int symbolVal(char symbol);
@@ -16,8 +17,8 @@ Liste globalCode = NULL;
 
 %union {
 	struct {
-		Liste true;
-		Liste false;
+		Liste vrai;
+		Liste faux;
 		int intval;
 		Quadop result;
 	} exprval;
@@ -25,11 +26,19 @@ Liste globalCode = NULL;
 		Liste next;
 	} gt;
 	Quadruplet mr;
+	struct {
+		int intval;
+		int boolval;
+		char* stringval;
+	} constLiteral;
+	int constInt;
 }
 
 %type <exprval> expr
 %type <gt> g statement block
 %type <mr> m
+%type <constLiteral> literal
+%type <constInt> int_literal
 
 %start program
 
@@ -108,12 +117,15 @@ statement 		: location EGAL expr SEMICOL						{printf("statement 1a\n");}
 				| method_call SEMICOL								{printf("statement 2\n");}
 
 				| IF OPAR expr CPAR m block							{
-																	complete($3.true, $5);
-																	$$.next = concat($3.false, $6.next);
+																	printf("Test :");
+																	// printQuad($5);
+																	complete($3.vrai, $5);
+																	$6.next = initList();
+																	$$.next = concat($3.faux, $6.next);
 																	}
 				| IF OPAR expr CPAR m block g ELSE m block			{
-																	complete($3.true, $5);
-																	complete($3.false, $9);
+																	complete($3.vrai, $5);
+																	complete($3.faux, $9);
 																	$$.next = concat($6.next, concat($7.next, $10.next));
 																	}
 
@@ -140,7 +152,8 @@ location 		: ID 							{printf("location 1\n");}
 
 expr 			: location 						{printf("expr 1\n");}
 				| method_call 					{printf("expr 2\n");}
-				| literal 						{printf("expr 3\n");}
+				| literal 						{ 	$$.intval = $1.intval;
+												}
 				| expr PLUS expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
@@ -155,17 +168,17 @@ expr 			: location 						{printf("expr 1\n");}
 
 				| expr INFEG expr				{
 												// Instanciation of test quad
-												$$.true = crelist(nextquad);
-												Quadop gt = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+												$$.vrai = crelist(nextquad);
+												Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
 												Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 												Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-												Quadruplet new = createQuad(Q_LE, op1, op2, gt);
-												gencode(new);
+												Quadruplet new1 = createQuad(Q_LE, op1, op2, gt1);
+												gencode(new1);
 												// Instanciation of goto quad
-												$$.false = crelist(nextquad);
-												gt = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
-												new = createQuad(Q_GOTO, gt, NULL, NULL);
-												gencode(new);
+												$$.faux = crelist(nextquad);
+												Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+												Quadruplet new2 = createQuad(Q_GOTO, gt2, NULL, NULL);
+												gencode(new2);
 												// À TESTER AVANT D'IMPLÉMENTER LES AUTRES (MÊME BAIL, JUSTE LE TYPE DE QUAD QUI CHANGE)
 												}
 				| expr SUPEG expr				{printf("SUPEG\n");}
@@ -175,18 +188,18 @@ expr 			: location 						{printf("expr 1\n");}
 				| expr B_NEGAL expr				{printf("NEG\n");}
 				
 				| expr AND m expr				{
-												complete($1.true, $3);
-												$$.false = concat($1.false, $4.false);
-												$$.true = $4.true;
+												complete($1.vrai, $3);
+												$$.faux = concat($1.faux, $4.faux);
+												$$.vrai = $4.vrai;
 												}
 				| expr OR m expr				{
-												complete($1.false, $3);
-												$$.true = concat($1.true, $4.true);
-												$$.false = $4.false;
+												complete($1.faux, $3);
+												$$.vrai = concat($1.vrai, $4.vrai);
+												$$.faux = $4.faux;
 												}
 				| NON expr						{
-												$$.true = $2.false;
-												$$.false = $2.true;
+												$$.vrai = $2.faux;
+												$$.faux = $2.vrai;
 												}
 				| OPAR expr CPAR				{
 												$$ = $2;
@@ -195,13 +208,13 @@ expr 			: location 						{printf("expr 1\n");}
 
 
 
-literal 		: int_literal 					{printf("literal 1\n");}
+literal 		: int_literal 					{ printf("1\n"); $$.intval = $1; printf("2\n");} 
 				| BOOL							{printf("literal 3\n");}
 				| CHARLIT	 					{printf("literal 2\n");}
 				;
 
 
-int_literal 	: DEC 							{printf("int_literal 1\n");}
+int_literal 	: DEC 							{ printf("3\n"); $$ = yylval.constInt; printf("4\n"); }
 				| HEX							{printf("int_literal 2\n");}
 				;
 
@@ -228,10 +241,12 @@ void gencode(Quadruplet new)
 	nextquad = new->next;
 }
 
-int main (void) {
+int main (int argc, char *argv[]) {
 	globalCode = initList();
+	nextquad = globalCode->first;
 	FILE *fp;
-	fp = fopen("input.txt", "r");
+	if (argc == 1) fp = fopen("test1.txt", "r");
+	else fp = fopen(argv[1], "r");
 	yyin = fp;
 	yyparse();
 	printList(globalCode);

@@ -1,6 +1,6 @@
 class Progam { //OUi bonjour
     int oui;
-    oui = 5;
+    //oui = 5;
     boolean non;
-    non = false;
+    //non = false;
 }
