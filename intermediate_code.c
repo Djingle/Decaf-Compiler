@@ -13,7 +13,6 @@ Quadruplet createQuad(){
     q->op1 = NULL;
     q->op2 = NULL;
     q->op3 = NULL;
-    q->next = NULL;
     return q;
 }
 
@@ -24,38 +23,38 @@ void fillQuad(Quadruplet q, quad_type type, Quadop op1, Quadop op2, Quadop op3)
     q->op2 = op2;
     q->op3 = op3;
 }
- 
-Liste initList()
+
+int l_size(Liste l)
 {
-    Liste l = (Liste)malloc(sizeof(list));
-    if (l == NULL) {printf("malloc failed\n"); exit(EXIT_FAILURE);}
-    l->first = NULL;
-    l->last = NULL;
-    l->size = 0;
-    return l;
+    int size = 0;
+    Liste save = l;
+    while (save->next!= NULL) {
+        size++;
+        save = save->next;
+    }
+    return size;
 }
 
-Liste crelist(Quadruplet adresse){
-    Liste liste = (Liste)malloc(sizeof(list));
-    if (liste == NULL) {printf("malloc failed\n"); exit(EXIT_FAILURE);}
-    liste->first = adresse;
-    liste->last = adresse;
-    liste->size = 1;
-    return liste;
+Lquad l_init() {return NULL;}
+
+Lquad l_creList(Quadruplet adresse){
+    Lquad new = (Lquad)malloc(sizeof(lquad));
+    if (new == NULL) {printf("malloc failed\n"); exit(EXIT_FAILURE);}
+    new->q = adresse;
+    new->next = NULL;
+    return new;
 }
 
-Liste push(Liste liste,Quadruplet adresse){
-    if(liste->size == 0) { // liste vide
-        liste->first = adresse;
-        liste->last = adresse;
-        liste->size++;
+Lquad l_push(Lquad liste,Quadruplet adresse){
+    Lquad new = (Lquad)malloc(sizeof(lquad));
+    new->q = adresse;
+    if(liste == NULL) { // liste vide
+        new->next = NULL;
     }
     else{
-        liste->last->next = adresse;
-        liste->last = adresse;
-        liste->size++;
+        new->next = liste;
     }
-    return liste;
+    return new;
 }
 Liste concat(Liste liste1, Liste liste2){
     //printList(liste1);

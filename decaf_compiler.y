@@ -136,7 +136,18 @@ statement 		: location EGAL expr SEMICOL						{printf("statement 1a\n");}
 																	}
 
 				
-				| FOR ID EGAL expr COMMA expr block					{printf("statement 5\n");}
+				| FOR ID EGAL expr {g} COMMA expr block					{
+																	    // complete($7.next,nextquad);
+																		// Quadop gt1 = createQuadop(QO_ADD, (u)(Quadruplet)NULL);
+																		//Quadop op1 = createQuadop(QO_CST, (u)$2.intval);
+																		//Quadop op2 = createQuadop(QO_CST, (u)1);
+																		// fillQuad(nextquad, Q_ADD, op1, op2, gt1);
+																		// gencode();
+																		// Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+																		// fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
+																		// gencode();
+																		// $$.next = crelist($TODO);
+																	}
 				| RETURN SEMICOL									{printf("statement 6\n");}
 				| RETURN expr SEMICOL								{printf("statement 7\n");}
 				| BREAK SEMICOL										{printf("statement 8\n");}
