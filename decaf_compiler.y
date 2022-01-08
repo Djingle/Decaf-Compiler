@@ -87,7 +87,11 @@ t_param 		: TYPE ID											{printf("param\n");}
 				| t_param COMMA TYPE ID								{printf("t_param\n");}
 				;
 
-block 			: OBRACK t_varDecl t_statement CBRACK				{printf("block\n");}
+block 			: OBRACK t_varDecl t_statement CBRACK				{
+																	// printf("oui\n");
+																	// $$.next = crelist(nextquad);
+																	// printList($$.next);
+																	}
 				;
 
 t_varDecl		: var_decl_l										{printf("t_varDecl\n");}
@@ -117,11 +121,13 @@ statement 		: location EGAL expr SEMICOL						{printf("statement 1a\n");}
 				| method_call SEMICOL								{printf("statement 2\n");}
 
 				| IF OPAR expr CPAR m block							{
-																	printf("Test :");
-																	// printQuad($5);
+																	// printList(globalCode);
+																	// printf("Test :\n");
 																	complete($3.vrai, $5);
+																	// printList(globalCode);
 																	$6.next = initList();
 																	$$.next = concat($3.faux, $6.next);
+																	// printList(globalCode);
 																	}
 				| IF OPAR expr CPAR m block g ELSE m block			{
 																	complete($3.vrai, $5);
@@ -157,8 +163,8 @@ expr 			: location 						{printf("expr 1\n");}
 				| expr PLUS expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													Quadruplet new = createQuad(Q_ADD, op1, op2, $$.result);
-													gencode(new);
+													fillQuad(nextquad, Q_ADD, op1, op2, $$.result);
+													gencode();
 												}
 				| expr MOINS expr				{printf("e-\n");}
 				| expr FOIS expr				{printf("e*\n");}
@@ -172,13 +178,13 @@ expr 			: location 						{printf("expr 1\n");}
 												Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
 												Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 												Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-												Quadruplet new1 = createQuad(Q_LE, op1, op2, gt1);
-												gencode(new1);
+												fillQuad(nextquad, Q_LE, op1, op2, gt1);
+												gencode();
 												// Instanciation of goto quad
 												$$.faux = crelist(nextquad);
 												Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
-												Quadruplet new2 = createQuad(Q_GOTO, gt2, NULL, NULL);
-												gencode(new2);
+												fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
+												gencode();
 												// À TESTER AVANT D'IMPLÉMENTER LES AUTRES (MÊME BAIL, JUSTE LE TYPE DE QUAD QUI CHANGE)
 												}
 				| expr SUPEG expr				{printf("SUPEG\n");}
@@ -221,8 +227,8 @@ int_literal 	: DEC 							{ printf("3\n"); $$ = yylval.constInt; printf("4\n"); 
 g			: /*empty*/ 						{
 												$$.next = crelist(nextquad);
 												Quadop op1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
-												Quadruplet new = createQuad(Q_GOTO, op1, NULL, NULL);
-												gencode(new);
+												fillQuad(nextquad, Q_GOTO, op1, NULL, NULL);
+												gencode();
 												}
 			;
 
@@ -235,20 +241,21 @@ m			: /*empty*/ 						{
 
 void yyerror (char *s) {fprintf (stderr, "error on symbol \"%s\"\n", s);}
 
-void gencode(Quadruplet new)
+void gencode()
 {
-	push(globalCode, new);
-	nextquad = new->next;
+	push(globalCode, nextquad);
+	nextquad = createQuad();
 }
 
 int main (int argc, char *argv[]) {
 	globalCode = initList();
-	nextquad = globalCode->first;
+	nextquad = createQuad();
 	FILE *fp;
 	if (argc == 1) fp = fopen("test1.txt", "r");
 	else fp = fopen(argv[1], "r");
 	yyin = fp;
 	yyparse();
+	printf("\n\nFINAL PRINTLIST\n");
 	printList(globalCode);
 	return 0;
 }

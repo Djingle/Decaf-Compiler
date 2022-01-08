@@ -46,12 +46,14 @@ typedef struct list {
 
 // Functions
 Quadop createQuadop(enum quadop_type type, union u value);
-Quadruplet createQuad(enum quad_type type, Quadop op1, Quadop op2, Quadop res);
-void printQuad(Quadruplet q);
+Quadruplet createQuad();
+void fillQuad(Quadruplet q, enum quad_type type, Quadop op1, Quadop op2, Quadop op3);
+
 
 Liste initList();
 Liste crelist(Quadruplet adresse);
 void printList(Liste l);
+void printQuad(Quadruplet q, Liste l);
 Liste push(Liste l, Quadruplet adresse);
 Liste concat(Liste l1, Liste l2);
 Liste complete(Liste l,Quadruplet adresse);
