@@ -2,6 +2,12 @@
 #include <string.h>
 #include <stdio.h>
 
+Fct* listFct = NULL; 
+Scope* global = NULL; 
+Scope* currentScope = NULL; 
+Var* varsInScope = NULL; 
+
+
 Fct newFct(char* name){
     Fct* fct = (Fct*)malloc(sizeof(Fct));
     strcpy(fct->name,name);

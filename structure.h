@@ -1,11 +1,7 @@
+
 typedef struct fct Fct;
 typedef struct scope Scope;
 typedef struct entry Var;
-
-Fct* listFct = NULL; 
-Scope* global = NULL; 
-Scope* currentScope = global; 
-Var* varsInScope = NULL; 
 
 typedef struct fct{
     char name[32];
@@ -28,3 +24,17 @@ typedef struct entry{
     } value;
     struct entry *next;  
 } Var;
+
+
+Fct newFct(char* name);
+Fct newScope();
+void putVar(char* type, char* name);
+void setVar(char* name, char* value);
+void pushVar(char* name);
+void putVars(char* type);
+void incrementVar(char* name, char* value);
+void decrementVar(char* name, char* value);
+void newVariable(char *name, char *type);
+void TwonewVariable(char *name1, char*name2 , char *type);
+void printVar(variable var);
+void printAllVars();

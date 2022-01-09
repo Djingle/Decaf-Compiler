@@ -5,6 +5,7 @@ int yylex();
 #include <stdlib.h>
 #include <stdbool.h>
 #include "intermediate_code.h"
+#include "symbols_table_var.h"
 int symbols[52];
 int symbolVal(char symbol);
 void updateSymbolVal(char symbol, int val);
@@ -113,6 +114,7 @@ t_varDecl		: var_decl_l										{
 				| /*empty*/ 										{}
 				;
 var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{
+<<<<<<< HEAD
 																		//putVars($2);	
 																	}
 				| TYPE var_elem SEMICOL								{	
@@ -125,6 +127,16 @@ var_elem		: ID												{
 				| var_elem COMMA ID									{	
 																		// pushVar($3);	
 																	}
+=======
+																		putVars($2.constString);	
+																	}
+				| TYPE var_elem SEMICOL								{	
+																		putVars($1.constString);	
+																	}
+				;
+var_elem		: ID												{	pushVar($1.constString);	}
+				| var_elem COMMA ID									{	pushVar($3.constString);	}
+>>>>>>> 2f9df5fbf4bbcb22266a6a2c42fbdf6a370a243c
 				;
 
 t_statement 	: statement_l										{}
