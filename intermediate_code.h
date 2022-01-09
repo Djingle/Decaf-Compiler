@@ -28,7 +28,6 @@ typedef struct quadop{
     } value;
 }quadop,*Quadop;
 
-
 typedef struct quad{
     quad_type type;
     Quadop op1,op2,op3;
