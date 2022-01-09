@@ -56,17 +56,13 @@ Lquad l_push(Lquad liste,Quadruplet adresse){
     }
     return new;
 }
+
 Lquad concat(Lquad liste1, Lquad liste2){
     //printList(liste1);
     //printList(liste2);
-    if (liste1->size == 0) return liste2;
-    if (liste2->size == 0) return liste1;
-    Liste liste;
-    liste1->last->next = liste2->first;
-    liste->first = liste1->first;
-    liste->last = liste2->last;
-    liste->size = liste1->size + liste2->size;
-    return liste;
+    for (int i=0; i<l_size(liste1); i++) {
+        
+    }
 }
 int place(Liste liste, Quadruplet q)
 {
