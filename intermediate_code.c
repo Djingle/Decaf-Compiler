@@ -56,7 +56,7 @@ Lquad l_push(Lquad liste,Quadruplet adresse){
     }
     return new;
 }
-Liste concat(Liste liste1, Liste liste2){
+Lquad concat(Lquad liste1, Lquad liste2){
     //printList(liste1);
     //printList(liste2);
     if (liste1->size == 0) return liste2;
