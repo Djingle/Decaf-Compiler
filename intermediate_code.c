@@ -100,13 +100,33 @@ void printQuad(Quadruplet q, Lquad l)
             if (q->op1->value.adresse_goto==NULL) printf("NULL\n");
             else printf("%d\n", l_place(l, q->op1->value.adresse_goto));
             break;
-        case Q_LT:
-            printf("Q_LT: %d, %d ", q->op1->value.cst, q->op2->value.cst);
-            if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
-            else printf("%d\n", q->op3->type);
-            break;
         case Q_LE:
             printf("Q_LE: %d, %d, ", q->op1->value.cst, q->op2->value.cst);
+            if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
+            else printf("%d\n", l_place(l, q->op3->value.adresse_goto));
+            break;
+        case Q_LT:
+            printf("Q_LT: %d, %d, ", q->op1->value.cst, q->op2->value.cst);
+            if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
+            else printf("%d\n", l_place(l, q->op3->value.adresse_goto));
+            break;
+        case Q_EQ:
+            printf("Q_EQ: %d, %d, ", q->op1->value.cst, q->op2->value.cst);
+            if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
+            else printf("%d\n", l_place(l, q->op3->value.adresse_goto));
+            break;
+        case Q_NE:
+            printf("Q_NE: %d, %d, ", q->op1->value.cst, q->op2->value.cst);
+            if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
+            else printf("%d\n", l_place(l, q->op3->value.adresse_goto));
+            break;
+        case Q_GE:
+            printf("Q_GE: %d, %d, ", q->op1->value.cst, q->op2->value.cst);
+            if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
+            else printf("%d\n", l_place(l, q->op3->value.adresse_goto));
+            break;
+        case Q_GT:
+            printf("Q_GT: %d, %d, ", q->op1->value.cst, q->op2->value.cst);
             if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
             else printf("%d\n", l_place(l, q->op3->value.adresse_goto));
             break;
