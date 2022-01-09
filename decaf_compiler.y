@@ -88,9 +88,6 @@ field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK	{} 								//TODO
 																		listvar($1);
 																		//pushVar($3);
 																	}
-				| ID												{
-																		//pushVar($1);
-																	}
 				;
 method_decl		: 	VOID ID OPAR t_param CPAR block					{	
 																		//newFct($2);	
