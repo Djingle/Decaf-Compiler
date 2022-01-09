@@ -59,7 +59,7 @@ Lquad globalCode = NULL;
 program   		: CLASSPRO OBRACK t_fielDecl t_methoDecl CBRACK		{printf("program\n");}
 				;
 
-t_fielDecl		: t_fielDecl TYPE field_elem SEMICOL				{printf("t_fielDecl\n");}
+t_fielDecl		: t_fielDecl TYPE field_elem SEMICOL				{putVars($2);}
 				| /*empty*/											{}
 				;
 
@@ -71,20 +71,27 @@ methoDecl_l		: methoDecl_l method_decl							{printf("method\n");}
 				| method_decl										{printf("method\n");}
 				;
 
+<<<<<<< HEAD
 field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK	{printf("tabliste\n");}
 				| ID OSBRACK int_literal CSBRACK					{printf("tabfinLquad\n");}
 				| field_elem COMMA ID								{printf("varliste\n");}
 				| ID												{printf("varfinliste\n");}
+=======
+field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK	{} 								//TODO
+				| ID OSBRACK int_literal CSBRACK					{} 								//TODO
+				| field_elem COMMA ID								{pushVar($3);}
+				| ID												{pushVar($1);}
+>>>>>>> ite2
 				;
 
-method_decl		: 	VOID ID OPAR t_param CPAR block					{printf("method_decl 1\n");}
-				| 	TYPE ID OPAR t_param CPAR block					{printf("method_decl 2\n");}
-				|	VOID ID OPAR CPAR block							{printf("method_decl 3\n");}
-				| 	TYPE ID OPAR CPAR block							{printf("method_decl 4\n");}
+method_decl		: 	VOID ID OPAR t_param CPAR block					{	newFct($2);	}
+				| 	TYPE ID OPAR t_param CPAR block					{	newFct($2);	}
+				|	VOID ID OPAR CPAR block							{	newFct($2);	}
+				| 	TYPE ID OPAR CPAR block							{	newFct($2);	}
 				;
 
-t_param 		: TYPE ID											{printf("param\n");}
-				| t_param COMMA TYPE ID								{printf("t_param\n");}
+t_param 		: TYPE ID											{putVar($1,$2);}
+				| t_param COMMA TYPE ID								{putVar($3,$4);}
 				;
 
 block 			: OBRACK t_varDecl t_statement CBRACK				{
@@ -96,18 +103,19 @@ t_varDecl		: var_decl_l										{printf("t_varDecl\n");}
 				| /*empty*/ 										{}
 				;
 
-var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{	newVar($2);	}
-				| TYPE var_elem SEMICOL								{	newVar($1);	}
+var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{	putVars($2);	}
+				| TYPE var_elem SEMICOL								{	putVars($1);	}
 				;
 
-var_elem		: ID												{	listvar($1);	}
-				| var_elem COMMA ID									{	listvar($3);	}
+var_elem		: ID												{	pushVar($1);	}
+				| var_elem COMMA ID									{	pushVar($3);	}
 				;
 
-t_statement 	: statement_l										{printf("statement\n");}
-		 		| /*empty*/											{printf("fin t_statement\n");}
+t_statement 	: statement_l										{}
+		 		| /*empty*/											{}
 				;
 
+<<<<<<< HEAD
 statement_l		: statement_l m statement							{$1.next = l_complete($1.next, $2);
 																	$$.next = $3.next;}
 				| statement											{$$.next = $1.next;}
@@ -132,6 +140,18 @@ statement 		: location EGAL expr SEMICOL						{
 																	}
 				| location MEGAL expr SEMICOL						{printf("statement 1b\n");}
 				| method_call SEMICOL								{printf("statement 2\n");}
+=======
+statement_l		: statement_l statement								{}
+				| statement											{}
+				;
+
+
+statement 		: location EGAL expr SEMICOL						{	setVar($1,$3.val); 			}
+				| location PEGAL expr SEMICOL						{	incrementVar($1,$3.intval); } // ID += expr
+				| location MEGAL expr SEMICOL						{	decrementVar($1,$3.intval); }
+				| method_call SEMICOL								{	/*execFct($1);*/	}					//TODO
+
+>>>>>>> ite2
 				| IF OPAR expr CPAR m block							{
 																	printf("Test :\n");
 																	l_print(globalCode);
@@ -170,8 +190,8 @@ statement 		: location EGAL expr SEMICOL						{
 				| block												{printf("statement 10\n");}
 				;
 
-method_call 	: ID OPAR t_expr CPAR 			{printf("method_call 1\n");}
-				| ID OPAR CPAR					{printf("method_call 2\n");}
+method_call 	: ID OPAR t_expr CPAR 			{/*setParamsFct($1);*/} 								//TODO
+				| ID OPAR CPAR					{}
 				;
 
 t_expr 			: expr 							{printf("fin t_expr\n");}
@@ -182,10 +202,9 @@ location 		: ID 							{printf("location 1\n");}
 				| ID OSBRACK expr CSBRACK		{printf("location 2\n");}
 				;
 
-expr 			: location 						{printf("expr 1\n");}
-				| method_call 					{printf("expr 2\n");}
-				| literal 						{ 	$$.intval = $1.intval;
-												}
+expr 			: location 						{	$$.intval=$1.intval;			}
+				| method_call 					{	/*$$.val=execFct($1);*/		}             //TODO
+				| literal 						{ 	$$.intval = $1.intval; 	}
 				| expr PLUS expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
