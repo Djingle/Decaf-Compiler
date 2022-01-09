@@ -96,12 +96,12 @@ t_varDecl		: var_decl_l										{printf("t_varDecl\n");}
 				| /*empty*/ 										{}
 				;
 
-var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{printf("vardecliste\n");}
-				| TYPE var_elem SEMICOL								{printf("finvardecliste\n");}
+var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{	newVar($2);	}
+				| TYPE var_elem SEMICOL								{	newVar($1);	}
 				;
 
-var_elem		: ID												{printf("finvarliste\n");}
-				| var_elem COMMA ID									{printf("varliste\n");}
+var_elem		: ID												{	listvar($1);	}
+				| var_elem COMMA ID									{	listvar($3);	}
 				;
 
 t_statement 	: statement_l										{printf("statement\n");}
@@ -126,7 +126,10 @@ statement 		: location EGAL expr SEMICOL						{
 																	Quadop op1 = createQuadop(QO_CST, (u)2000);
 																	Quadop op2 = createQuadop(QO_CST, (u)2000);
 																	fillQuad(nextquad, Q_ADD, op1, op2, op1);
-																	gencode();}
+																	gencode();
+																	setVal($1)
+																	printf("statement 1a\n");
+																	}
 				| location MEGAL expr SEMICOL						{printf("statement 1b\n");}
 				| method_call SEMICOL								{printf("statement 2\n");}
 				| IF OPAR expr CPAR m block							{
