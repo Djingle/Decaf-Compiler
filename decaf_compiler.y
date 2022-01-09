@@ -63,6 +63,7 @@ program   		: CLASSPRO OBRACK t_fielDecl t_methoDecl CBRACK		{
 				;
 t_fielDecl		: t_fielDecl TYPE field_elem SEMICOL				{
 																		newVar($2);
+																		//putVars($2);
 																	}
 				| /*empty*/											{}
 				;
@@ -85,6 +86,10 @@ field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK	{} 								//TODO
 																	}
 				| ID												{
 																		listvar($1);
+																		//pushVar($3);
+																	}
+				| ID												{
+																		//pushVar($1);
 																	}
 				;
 method_decl		: 	VOID ID OPAR t_param CPAR block					{	
@@ -118,13 +123,21 @@ t_varDecl		: var_decl_l										{
 				;
 var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{
 																		newVar($2);	
+
 																	}
 				| TYPE var_elem SEMICOL								{	
 																		newVar($1);	
 																	}
 				;
-var_elem		: ID												{	listvar($1);	}
-				| var_elem COMMA ID									{	listvar($3);	}
+var_elem		: ID												{	
+																		listvar($1);
+																		//pushVar($1.constString);
+																	}
+				| var_elem COMMA ID									{	
+																		listvar($3);
+																		//pushVar($3.constString);
+																	}
+
 				;
 
 t_statement 	: statement_l										{}
@@ -146,6 +159,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		fillQuad(nextquad, Q_ADD, op1, op2, op1);
 																		gencode();
 																		setVal($1,convertIntegerToChar($3.intval)); 	// FROM AYOUB
+																		//setVar($1,$3.val); 	// FROM AYOUB
 																	}
 				| location PEGAL expr SEMICOL						{
 																		Quadop op1 = createQuadop(QO_CST, (u)2000);
@@ -165,13 +179,16 @@ statement 		: location EGAL expr SEMICOL						{
 																		//execFct($1);				//TODO
 																	}
 				| IF OPAR expr CPAR m block							{
-																		//printf("Test :\n");
-																		//l_print(globalCode);
+																		printf("Test :\n");
+																		l_print(globalCode);
+																		l_print($3.vrai);
 																		$3.vrai = l_complete($3.vrai, $5);
-																		//l_print(globalCode);
+																		printf("AVANT :\n");
+																		l_print(globalCode);
 																		$6.next = l_init();
 																		$$.next = l_concat($3.faux, $6.next);
-																		//l_print(globalCode);
+																		printf("APRES :\n");
+																		l_print(globalCode);
 																	}
 				| IF OPAR expr CPAR m block g ELSE m block			{
 																		l_complete($3.vrai, $5);
@@ -239,32 +256,42 @@ expr 			: location 						{
 													$$.intval = atoi($1.stringval); 
 												}
 				| expr PLUS expr				{
+													printf("On est là\n");
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													fillQuad(nextquad, Q_ADD, op1, op2, $$.result);
+													Quadop res = createQuadop(QO_CST, (u)(op1->value.cst+op2->value.cst));
+													printf("op1->val : %d\n", op1->value.cst);
+													printf("op2->val : %d\n", op2->value.cst);
+													printf("res->val : %d\n", res->value.cst);
+													fillQuad(nextquad, Q_ADD, op1, op2, res);
+													$$.intval = op1->value.cst + op2->value.cst;
 													gencode();
 												}
 				| expr MOINS expr				{	Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 													fillQuad(nextquad, Q_SUB, op1, op2, $$.result);
+													$$.intval = op1->value.cst - op2->value.cst;
 													gencode();
 												}
 				| expr FOIS expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 													fillQuad(nextquad, Q_MUL, op1, op2, $$.result);
+													$$.intval = op1->value.cst * op2->value.cst;
 													gencode();
 												}
 				| expr DIVISER expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 													fillQuad(nextquad, Q_DIV, op1, op2, $$.result);
+													$$.intval = op1->value.cst / op2->value.cst;
 													gencode();
 												}
 				| expr MODULO expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 													fillQuad(nextquad, Q_MOD, op1, op2, $$.result);
+													$$.intval = op1->value.cst % op2->value.cst;
 													gencode();
 												}
 				| MOINS expr					{
@@ -412,7 +439,7 @@ int main (int argc, char *argv[]) {
 	globalCode = l_init();
 	nextquad = createQuad();
 	FILE *fp;
-	if (argc == 1) fp = fopen("test1.txt", "r");
+	if (argc == 1) fp = fopen("test2.txt", "r");
 	else fp = fopen(argv[1], "r");
 	yyin = fp;
 	yyparse();
