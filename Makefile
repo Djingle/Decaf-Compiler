@@ -1,7 +1,7 @@
 prefixe=decaf_compiler
 
-all: y.tab.o lex.yy.o intermediate_code.o
-	gcc y.tab.o lex.yy.o intermediate_code.o -lfl -o $(prefixe)
+all: y.tab.o lex.yy.o intermediate_code.o symbols_table_var.o
+	gcc y.tab.o lex.yy.o intermediate_code.o symbols_table_var.o -lfl -o $(prefixe)
 
 
 y.tab.o: $(prefixe).y intermediate_code.h
@@ -15,6 +15,8 @@ lex.yy.o: $(prefixe).l y.tab.h
 intermediate_code.o: intermediate_code.c intermediate_code.h
 	gcc -c intermediate_code.c
 
+symbols_table_var.o: symbols_table_var.c symbols_table_var.h
+	gcc -c symbols_table_var.c
 
 clean:
 	rm -f *.o y.tab.c y.tab.h lex.yy.c a.out y.output test $(prefixe)

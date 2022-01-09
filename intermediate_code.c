@@ -1,5 +1,4 @@
 #include "intermediate_code.h"
-#include "symbols_table.h"
 
 Quadop createQuadop(enum quadop_type type,u value){
     Quadop q = (Quadop)malloc(sizeof(quadop));

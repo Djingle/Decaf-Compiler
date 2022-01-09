@@ -3,6 +3,7 @@ typedef struct fct Fct;
 typedef struct scope Scope;
 typedef struct entry Var;
 
+
 typedef struct fct{
     char name[32];
     struct Scope *scope;
@@ -36,5 +37,5 @@ void incrementVar(char* name, char* value);
 void decrementVar(char* name, char* value);
 void newVariable(char *name, char *type);
 void TwonewVariable(char *name1, char*name2 , char *type);
-void printVar(variable var);
+void printVar(Var var);
 void printAllVars();

@@ -4,8 +4,8 @@ int yylex();
 #include <stdio.h>     /* C declarations used in actions */
 #include <stdlib.h>
 #include <stdbool.h>
-#include "symbols_table_var.h"
 #include "intermediate_code.h"
+#include "symbols_table_var.h"
 int symbols[52];
 int symbolVal(char symbol);
 void updateSymbolVal(char symbol, int val);
@@ -145,7 +145,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		Quadop op2 = createQuadop(QO_CST, (u)1000);
 																		fillQuad(nextquad, Q_ADD, op1, op2, op1);
 																		gencode();
-																		setVal($1,convertIntegerToChar($3.intval)); 	// FROM AYOUB
+																		setVal($1,$3); 	// FROM AYOUB
 																	}
 				| location PEGAL expr SEMICOL						{
 																		Quadop op1 = createQuadop(QO_CST, (u)2000);
@@ -165,13 +165,13 @@ statement 		: location EGAL expr SEMICOL						{
 																		//execFct($1);				//TODO
 																	}
 				| IF OPAR expr CPAR m block							{
-																		//printf("Test :\n");
-																		//l_print(globalCode);
+																		printf("Test :\n");
+																		l_print(globalCode);
 																		$3.vrai = l_complete($3.vrai, $5);
-																		//l_print(globalCode);
+																		l_print(globalCode);
 																		$6.next = l_init();
 																		$$.next = l_concat($3.faux, $6.next);
-																		//l_print(globalCode);
+																		l_print(globalCode);
 																	}
 				| IF OPAR expr CPAR m block g ELSE m block			{
 																		l_complete($3.vrai, $5);

@@ -2,6 +2,7 @@
 #define SYMBOLS_TABLE_VAR_H
 
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct tempvar{
     char* name;
@@ -12,7 +13,7 @@ typedef union operand_val operand_val;
 typedef enum operand_type {
     OP_INT, OP_BOOL
 } operand_type;
-typedef struct var_entry{
+typedef struct entry{
     operand_type type;
     char name[32];
     union operand_val {
@@ -28,8 +29,7 @@ typedef struct scope{
     struct scope *parent;
 } Scope;
 
-tempvar *templist = NULL; 
-Scope *pile = NULL; 
+ 
 void listvar(char* name);
 void clearListVar();
 void pushctx();
@@ -39,5 +39,6 @@ void newVar(char *);
 variable *setVal(char *, char *);
 void setValUtil(variable *, operand_val);
 variable* lookup(char *);
+char* convertIntegerToChar(int n);
 
 #endif

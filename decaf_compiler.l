@@ -55,7 +55,7 @@ CHAR [a-zA-Z]|" "|"\n"
 {TYPE}                  {yylval.constString = yytext;return TYPE;}
 "true"|"false"          {return BOOL;}
 "0x"{HEX_DIG}{HEX_DIG}* { yylval.constString = yytext; return HEX;}
-{DIG}{DIG}*             { yylval.constInt = atoi(yytext); return DEC;}
+{DIG}{DIG}*             { yylval.constString =yytext; return DEC;}
 ";"                     {return SEMICOL;}
 "void"                  {return VOID;}
 "for"                   {return FOR;}

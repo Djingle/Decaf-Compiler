@@ -1,5 +1,7 @@
 #include "symbols_table_var.h"
 #include <string.h>
+tempvar *templist = NULL; 
+Scope *pile = NULL;
 void pushctx(){
     Scope *temp = (Scope*)malloc(sizeof(Scope));
     temp->parent = pile;
@@ -33,6 +35,7 @@ void clearListVar(){
 }
 
 void newVar(char* type){
+    printf("attempting newVar with %s\n",type);
     if(!pile)
         pushctx();
     tempvar *temp = templist;
@@ -77,6 +80,7 @@ int myatoi(char *val){
     }*/
 }
 variable *setVal(char *name, char* val){
+    printf("attempting setVal with name = \"%s\" and val = \"%s\" ", name, val);
     if(pile == NULL)
         return NULL;
     Scope *c = pile;
@@ -163,6 +167,35 @@ void printAllVars(){
         c = c->parent;
     }
 }
+//UTILITY
+
+char* convertIntegerToChar(int n)
+{
+ 
+    printf("\nconverting %d to char *\n", n);
+    int m = n;
+    int digit = 0;
+    while (m) {
+        digit++;
+        m /= 10;
+    }
+    char* arr; 
+    char arr1[digit];
+    arr = (char*)malloc(digit);
+    int index = 0;
+    while (n) {
+        arr1[++index] = n % 10 + '0'; 
+        n /= 10;
+    }
+    int i;
+    for (i = 0; i < index; i++) {
+        arr[i] = arr1[index - i];
+    }
+    arr[i] = '\0';
+    return (char*)arr;
+}
+
+/*
 int main(){
     newVariable("temp", "int");
     setVal("temp1", "0");
@@ -177,3 +210,5 @@ int main(){
     printAllVars();
     return 1;
 }
+
+*/
