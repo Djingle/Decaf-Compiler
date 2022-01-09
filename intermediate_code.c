@@ -7,85 +7,99 @@ Quadop createQuadop(enum quadop_type type,u value){
     q->value = value;
     return q;
 }
-Quadruplet createQuad(enum quad_type type, Quadop op1, Quadop op2, Quadop res){
+Quadruplet createQuad(){
     Quadruplet q = (Quadruplet)malloc(sizeof(quad));
+    q->type = 0;
+    q->op1 = NULL;
+    q->op2 = NULL;
+    q->op3 = NULL;
+    return q;
+}
+
+void fillQuad(Quadruplet q, quad_type type, Quadop op1, Quadop op2, Quadop op3)
+{
     q->type = type;
     q->op1 = op1;
     q->op2 = op2;
-    q->op3 = res;
-    q->next = NULL;
-    return q;
+    q->op3 = op3;
 }
- 
-Liste initList()
+
+int l_size(Liste l)
 {
-    Liste l = (Liste)malloc(sizeof(list));
-    if (l == NULL) {printf("malloc failed\n"); exit(EXIT_FAILURE);}
-    l->first = NULL;
-    l->last = NULL;
-    l->size = 0;
-    return l;
+    int size = 0;
+    Liste save = l;
+    while (save->next!= NULL) {
+        size++;
+        save = save->next;
+    }
+    return size;
 }
 
-Liste crelist(Quadruplet adresse){
-    Liste liste = (Liste)malloc(sizeof(list));
-    if (liste == NULL) {printf("malloc failed\n"); exit(EXIT_FAILURE);}
-    liste->first = adresse;
-    liste->last = adresse;
-    liste->size = 1;
-    return liste;
+Lquad l_init() {return NULL;}
+
+Lquad l_creList(Quadruplet adresse){
+    Lquad new = (Lquad)malloc(sizeof(lquad));
+    if (new == NULL) {printf("malloc failed\n"); exit(EXIT_FAILURE);}
+    new->q = adresse;
+    new->next = NULL;
+    return new;
 }
 
-Liste push(Liste liste,Quadruplet adresse){
-    if(liste->size == 0) { // liste vide
-        liste->first = adresse;
-        liste->last = adresse;
-        liste->size++;
+Lquad l_push(Lquad liste,Quadruplet adresse){
+    Lquad new = (Lquad)malloc(sizeof(lquad));
+    new->q = adresse;
+    if(liste == NULL) { // liste vide
+        new->next = NULL;
     }
     else{
-        liste->last->next = adresse;
-        liste->last = adresse;
-        liste->size++;
+        new->next = liste;
     }
-    return liste;
+    return new;
 }
-Liste concat(Liste liste1, Liste liste2){
-    printList(liste1);
-    printList(liste2);
-    if (liste1->size == 0) return liste2;
-    if (liste2->size == 0) return liste1;
-    Liste liste;
-    liste1->last->next = liste2->first;
-    liste->first = liste1->first;
-    liste->last = liste2->last;
-    liste->size = liste1->size + liste2->size;
-    return liste;
+
+Lquad concat(Lquad liste1, Lquad liste2){
+    //printList(liste1);
+    //printList(liste2);
+    for (int i=0; i<l_size(liste1); i++) {
+        
+    }
 }
+int place(Liste liste, Quadruplet q)
+{
+    int place = 0;
+    Quadruplet save = liste->first;
+    for (int i = 0; i<liste->size; i++) {
+        if (q == save) return place;
+        place ++;
+        save = save->next;
+    }
+    return -1;
+}
+
 void printList(Liste liste){
     if(liste->size == 0){
         printf("Liste vide\n");
     }
     else{
-        printf("Liste: \n");
         Quadruplet q = liste->first;
         int c=0;
-        while(q != NULL){
+        for (int i=0; i<liste->size; i++) {
             printf("%d: ", c);
-            printQuad(q);
+            printQuad(q, liste);
             q = q->next;
             c++;
         }
     }
     printf("\n");
 }
-void printQuad(Quadruplet q)
+void printQuad(Quadruplet q, Liste l)
 {
     quad_type type = q->type;
     switch(type) {
         case Q_GOTO:
             printf("Q_GOTO: ");
             if (q->op1->value.adresse_goto==NULL) printf("NULL\n");
-            else printf("%d\n", q->op1->type);
+            else printf("%d\n", place(l, q->op1->value.adresse_goto));
             break;
         case Q_LT:
             printf("Q_LT: %d, %d ", q->op1->value.cst, q->op2->value.cst);
@@ -93,9 +107,9 @@ void printQuad(Quadruplet q)
             else printf("%d\n", q->op3->type);
             break;
         case Q_LE:
-            printf("Q_LE: %d, %d ", q->op1->value.cst, q->op2->value.cst);
+            printf("Q_LE: %d, %d, ", q->op1->value.cst, q->op2->value.cst);
             if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
-            else printf("%d\n", q->op3->type);
+            else printf("%d\n", place(l, q->op3->value.adresse_goto));
             break;
         case Q_ADD: printf("Q_ADD: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->type); break;
         case Q_SUB: printf("Q_SUB: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->type); break;
@@ -105,15 +119,20 @@ void printQuad(Quadruplet q)
     }
 }
 Liste complete(Liste l,Quadruplet adresse){
-    printf("ouioui\n");
+    if (adresse == NULL) printf("NULL complete\n");
+    // printf("lgr liste: ");
+    // printf("%d\n",l->size);
     int compteur;
-    printList(l);
-    if (l==NULL) return l;
+    //printList(l);
+    if (l->size == 0){
+        // printf("Liste vide\n");
+        return l;
+    }
     Quadruplet save = l->first;
     int c = 0;
-    while(save != NULL){
+    for (int i=0; i<l->size; i++){
         quad_type type = save->type;
-        printf("::%d:: %d\n", c, type);
+        // printf("::%d:: %d\n", c, type);
         switch(type){
             case Q_GOTO:
                 if (save->op1->value.adresse_goto==NULL) {

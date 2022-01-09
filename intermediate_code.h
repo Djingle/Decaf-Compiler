@@ -19,7 +19,6 @@ typedef enum quad_type {
     Q_AND,Q_OR,Q_NOT,Q_RETURN,Q_GOTO,Q_IF,Q_CALL,Q_PARAM,Q_READ,Q_WRITE
 } quad_type;
 
-//QO_GOTOI stands for goto incomplete
 typedef struct quadop{
     quadop_type type;
     union u {
@@ -30,28 +29,27 @@ typedef struct quadop{
 }quadop,*Quadop;
 
 
-struct quad{
+typedef struct quad{
     quad_type type;
     Quadop op1,op2,op3;
-    struct quad *next;
-}; 
-typedef quad* Quadruplet;
+} *Quadruplet; 
 
-typedef struct list {
-    Quadruplet first;
-    Quadruplet last;
-    int size;
-} list, *Liste;
+typedef struct lquad {
+    Quadruplet q;
+    struct lquad* next;
+}lquad, *Lquad;
 
 
 // Functions
 Quadop createQuadop(enum quadop_type type, union u value);
-Quadruplet createQuad(enum quad_type type, Quadop op1, Quadop op2, Quadop res);
-void printQuad(Quadruplet q);
+Quadruplet createQuad();
+void fillQuad(Quadruplet q, enum quad_type type, Quadop op1, Quadop op2, Quadop op3);
 
-Liste initList();
-Liste crelist(Quadruplet adresse);
+
+Lquad initList();
+Lquad crelist(Quadruplet adresse);
 void printList(Liste l);
+void printQuad(Quadruplet q, Liste l);
 Liste push(Liste l, Quadruplet adresse);
 Liste concat(Liste l1, Liste l2);
 Liste complete(Liste l,Quadruplet adresse);
