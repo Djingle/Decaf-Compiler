@@ -54,7 +54,7 @@ CHAR [a-zA-Z]|" "|"\n"
 "||"                    {return OR;}
 {TYPE}                  {return TYPE;}
 "true"|"false"          {return BOOL;}
-"0x"{HEX_DIG}{HEX_DIG}* {return HEX;}
+"0x"{HEX_DIG}{HEX_DIG}* { yylval.constString = yytext; return HEX;}
 {DIG}{DIG}*             { yylval.constInt = atoi(yytext); return DEC;}
 ";"                     {return SEMICOL;}
 "void"                  {return VOID;}

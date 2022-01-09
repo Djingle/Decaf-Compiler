@@ -12,9 +12,7 @@ extern FILE *yyin;
 int yydebug = 1;
 Quadruplet nextquad = NULL;
 Lquad globalCode = NULL;
-
 %}
-
 %union {
 	struct {
 		Lquad vrai;
@@ -32,6 +30,7 @@ Lquad globalCode = NULL;
 		char* stringval;
 	} constLiteral;
 	int constInt;
+	char* constString;
 }
 
 %type <exprval> expr
@@ -53,60 +52,65 @@ Lquad globalCode = NULL;
 %nonassoc INFEG SUPEG INF SUP B_EGAL B_NEGAL
 %left AND OR
 
-
 %%
-
-program   		: CLASSPRO OBRACK t_fielDecl t_methoDecl CBRACK		{printf("program\n");}
+program   		: CLASSPRO OBRACK t_fielDecl t_methoDecl CBRACK		{
+																		printf("program\n");
+																	}
 				;
-
-t_fielDecl		: t_fielDecl TYPE field_elem SEMICOL				{putVars($2);}
+t_fielDecl		: t_fielDecl TYPE field_elem SEMICOL				{
+																		putVars($2);
+																	}
 				| /*empty*/											{}
 				;
-
-t_methoDecl 	: methoDecl_l										{printf("t_methoDecl\n");}
+t_methoDecl 	: methoDecl_l										{
+																		printf("t_methoDecl\n");
+																	}
 				| /*empty*/											{}
 				;
-
-methoDecl_l		: methoDecl_l method_decl							{printf("method\n");}
-				| method_decl										{printf("method\n");}
+methoDecl_l		: methoDecl_l method_decl							{
+																		printf("method\n");
+																	}
+				| method_decl										{
+																		printf("method\n");
+																	}
 				;
-
-<<<<<<< HEAD
-field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK	{printf("tabliste\n");}
-				| ID OSBRACK int_literal CSBRACK					{printf("tabfinLquad\n");}
-				| field_elem COMMA ID								{printf("varliste\n");}
-				| ID												{printf("varfinliste\n");}
-=======
 field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK	{} 								//TODO
 				| ID OSBRACK int_literal CSBRACK					{} 								//TODO
-				| field_elem COMMA ID								{pushVar($3);}
-				| ID												{pushVar($1);}
->>>>>>> ite2
+				| field_elem COMMA ID								{
+																		pushVar($3);
+																	}
+				| ID												{
+																		pushVar($1);
+																	}
 				;
-
 method_decl		: 	VOID ID OPAR t_param CPAR block					{	newFct($2);	}
 				| 	TYPE ID OPAR t_param CPAR block					{	newFct($2);	}
 				|	VOID ID OPAR CPAR block							{	newFct($2);	}
 				| 	TYPE ID OPAR CPAR block							{	newFct($2);	}
 				;
-
-t_param 		: TYPE ID											{putVar($1,$2);}
-				| t_param COMMA TYPE ID								{putVar($3,$4);}
-				;
-
-block 			: OBRACK t_varDecl t_statement CBRACK				{
-																	printf("la\n");
+t_param 		: TYPE ID											{
+																		putVar($1,$2);
+																	}
+				| t_param COMMA TYPE ID								{ 
+																		putVar($3,$4);
 																	}
 				;
-
-t_varDecl		: var_decl_l										{printf("t_varDecl\n");}
+block 			: OBRACK t_varDecl t_statement CBRACK				{
+																		printf("la\n");
+																	}
+				;
+t_varDecl		: var_decl_l										{
+																		printf("t_varDecl\n");
+																	}
 				| /*empty*/ 										{}
 				;
-
-var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{	putVars($2);	}
-				| TYPE var_elem SEMICOL								{	putVars($1);	}
+var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{
+																		putVars($2);	
+																	}
+				| TYPE var_elem SEMICOL								{	
+																		putVars($1);	
+																	}
 				;
-
 var_elem		: ID												{	pushVar($1);	}
 				| var_elem COMMA ID									{	pushVar($3);	}
 				;
@@ -114,68 +118,62 @@ var_elem		: ID												{	pushVar($1);	}
 t_statement 	: statement_l										{}
 		 		| /*empty*/											{}
 				;
-
-<<<<<<< HEAD
-statement_l		: statement_l m statement							{$1.next = l_complete($1.next, $2);
-																	$$.next = $3.next;}
-				| statement											{$$.next = $1.next;}
+statement_l		: statement_l m statement							{
+																		$1.next = l_complete($1.next, $2);
+																		$$.next = $3.next;
+																	}
+				| statement											{
+																		$$.next = $1.next;
+																	}
 				;
-
-
 statement 		: location EGAL expr SEMICOL						{
-																	// J'AI MIS DES FAUX TRUCS POUR TESTER, JE LES LAISSE COMME ÇA TU PEUX TEST ET VOIR SI LES GOTO VONT AU BON ENDROIT
-																	printf("now\n");
-																	Quadop op1 = createQuadop(QO_CST, (u)1000);
-																	Quadop op2 = createQuadop(QO_CST, (u)1000);
-																	fillQuad(nextquad, Q_ADD, op1, op2, op1);
-																	gencode();
+																		// J'AI MIS DES FAUX TRUCS POUR TESTER, JE LES LAISSE COMME ÇA TU PEUX TEST ET VOIR SI LES GOTO VONT AU BON ENDROIT
+																		printf("now\n");
+																		Quadop op1 = createQuadop(QO_CST, (u)1000);
+																		Quadop op2 = createQuadop(QO_CST, (u)1000);
+																		fillQuad(nextquad, Q_ADD, op1, op2, op1);
+																		gencode();
+																		setVar($1,$3.val); 	// FROM AYOUB
 																	}
 				| location PEGAL expr SEMICOL						{
-																	Quadop op1 = createQuadop(QO_CST, (u)2000);
-																	Quadop op2 = createQuadop(QO_CST, (u)2000);
-																	fillQuad(nextquad, Q_ADD, op1, op2, op1);
-																	gencode();
-																	setVal($1)
-																	printf("statement 1a\n");
+																		Quadop op1 = createQuadop(QO_CST, (u)2000);
+																		Quadop op2 = createQuadop(QO_CST, (u)2000);
+																		fillQuad(nextquad, Q_ADD, op1, op2, op1);
+																		gencode();
+																		setVal($1)
+																		printf("statement 1a\n");
+																		incrementVar($1,$3.intval); /// FROM AYOUB
 																	}
-				| location MEGAL expr SEMICOL						{printf("statement 1b\n");}
-				| method_call SEMICOL								{printf("statement 2\n");}
-=======
-statement_l		: statement_l statement								{}
-				| statement											{}
-				;
-
-
-statement 		: location EGAL expr SEMICOL						{	setVar($1,$3.val); 			}
-				| location PEGAL expr SEMICOL						{	incrementVar($1,$3.intval); } // ID += expr
-				| location MEGAL expr SEMICOL						{	decrementVar($1,$3.intval); }
-				| method_call SEMICOL								{	/*execFct($1);*/	}					//TODO
-
->>>>>>> ite2
+				| location MEGAL expr SEMICOL						{
+																		printf("statement 1b\n");
+																		decrementVar($1,$3.intval);
+																	}
+					| method_call SEMICOL							{
+																		printf("statement 2\n");
+																		execFct($1);				//TODO
+																	}
 				| IF OPAR expr CPAR m block							{
-																	printf("Test :\n");
-																	l_print(globalCode);
-																	$3.vrai = l_complete($3.vrai, $5);
-																	l_print(globalCode);
-																	$6.next = l_init();
-																	$$.next = l_concat($3.faux, $6.next);
-																	l_print(globalCode);
+																		printf("Test :\n");
+																		l_print(globalCode);
+																		$3.vrai = l_complete($3.vrai, $5);
+																		l_print(globalCode);
+																		$6.next = l_init();
+																		$$.next = l_concat($3.faux, $6.next);
+																		l_print(globalCode);
 																	}
 				| IF OPAR expr CPAR m block g ELSE m block			{
-																	l_complete($3.vrai, $5);
-																	l_complete($3.faux, $9);
-																	$6.next = l_init();
-																	$7.next = l_init();
-																	$10.next = l_init();
-																	$$.next = l_concat($6.next, l_concat($7.next, $10.next));
+																		l_complete($3.vrai, $5);
+																		l_complete($3.faux, $9);
+																		$6.next = l_init();
+																		$7.next = l_init();
+																		$10.next = l_init();
+																		$$.next = l_concat($6.next, l_concat($7.next, $10.next));
 																	}
-
-				
 				| FOR ID EGAL expr COMMA expr block					{
 																	    // l_complete($7.next,nextquad);
 																		// Quadop gt1 = createQuadop(QO_ADD, (u)(Quadruplet)NULL);
-																		//Quadop op1 = createQuadop(QO_CST, (u)$2.intval);
-																		//Quadop op2 = createQuadop(QO_CST, (u)1);
+																		// Quadop op1 = createQuadop(QO_CST, (u)$2.intval);
+																		// Quadop op2 = createQuadop(QO_CST, (u)1);
 																		// fillQuad(nextquad, Q_ADD, op1, op2, gt1);
 																		// gencode();
 																		// Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
@@ -183,115 +181,220 @@ statement 		: location EGAL expr SEMICOL						{	setVar($1,$3.val); 			}
 																		// gencode();
 																		// $$.next = l_create($TODO);
 																	}
-				| RETURN SEMICOL									{printf("statement 6\n");}
-				| RETURN expr SEMICOL								{printf("statement 7\n");}
-				| BREAK SEMICOL										{printf("statement 8\n");}
-				| CONTINUE SEMICOL									{printf("statement 9\n");}
-				| block												{printf("statement 10\n");}
+				| RETURN SEMICOL									{
+																		printf("statement 6\n");
+																	}
+				| RETURN expr SEMICOL								{
+																		printf("statement 7\n");
+																	}
+				| BREAK SEMICOL										{
+																		printf("statement 8\n");
+																	}
+				| CONTINUE SEMICOL									{
+																		printf("statement 9\n");
+																	}
+				| block												{
+																		printf("statement 10\n");
+																	}
 				;
-
-method_call 	: ID OPAR t_expr CPAR 			{/*setParamsFct($1);*/} 								//TODO
+method_call 	: ID OPAR t_expr CPAR 			{
+													/*setParamsFct($1);*/				//TODO
+												} 								
 				| ID OPAR CPAR					{}
 				;
-
-t_expr 			: expr 							{printf("fin t_expr\n");}
-				| t_expr COMMA expr				{printf("t_expr\n");}
+t_expr 			: expr 							{
+													printf("fin t_expr\n");
+												}
+				| t_expr COMMA expr				{
+													printf("t_expr\n");
+												}
 				;
-
-location 		: ID 							{printf("location 1\n");}
-				| ID OSBRACK expr CSBRACK		{printf("location 2\n");}
+location 		: ID 							{
+													printf("location 1\n");
+												}
+				| ID OSBRACK expr CSBRACK		{
+													printf("location 2\n");
+												}
 				;
-
-expr 			: location 						{	$$.intval=$1.intval;			}
-				| method_call 					{	/*$$.val=execFct($1);*/		}             //TODO
-				| literal 						{ 	$$.intval = $1.intval; 	}
+expr 			: location 						{	
+													$$.intval=$1.intval;			
+												}
+				| method_call 					{	
+													/*$$.val=execFct($1);*/		  //TODO
+												}           
+				| literal 						{ 	
+													$$.intval = $1.intval; 
+												}
 				| expr PLUS expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 													fillQuad(nextquad, Q_ADD, op1, op2, $$.result);
 													gencode();
 												}
-				| expr MOINS expr				{printf("e-\n");}
-				| expr FOIS expr				{printf("e*\n");}
-				| expr DIVISER expr				{printf("e/\n");}
-				| expr MODULO expr				{printf("modulo\n");}
-				| MOINS expr					{printf("expr 5\n");}
-
-				| expr INFEG expr				{
-												// Instanciation of test quad
-												$$.vrai = l_create(nextquad);
-												Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
-												Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
-												Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-												fillQuad(nextquad, Q_LE, op1, op2, gt1);
-												gencode();
-												// Instanciation of goto quad
-												$$.faux = l_create(nextquad);
-												Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
-												fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
-												gencode();
-												// À TESTER AVANT D'IMPLÉMENTER LES AUTRES (MÊME BAIL, JUSTE LE TYPE DE QUAD QUI CHANGE)
+				| expr MOINS expr				{	Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_SUB, op1, op2, $$.result);
+													gencode();
 												}
-				| expr SUPEG expr				{printf("SUPEG\n");}
-				| expr INF expr					{printf("INF\n");}
-				| expr SUP expr					{printf("SUP\n");}
-				| expr B_EGAL expr				{printf("EG\n");}
-				| expr B_NEGAL expr				{printf("NEG\n");}
-				
+				| expr FOIS expr				{
+													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_MUL, op1, op2, $$.result);
+													gencode();
+												}
+				| expr DIVISER expr				{
+													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_DIV, op1, op2, $$.result);
+													gencode();
+												}
+				| expr MODULO expr				{
+													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_MOD, op1, op2, $$.result);
+													gencode();
+												}
+				| MOINS expr					{
+													printf("expr 5\n");
+												}
+				| expr INFEG expr				{
+													// Instanciation of test quad
+													$$.vrai = l_create(nextquad);
+													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_LE, op1, op2, gt1);
+													gencode();
+													// Instanciation of goto quad
+													$$.faux = l_create(nextquad);
+													Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
+													gencode();
+													// À TESTER AVANT D'IMPLÉMENTER LES AUTRES (MÊME BAIL, JUSTE LE TYPE DE QUAD QUI CHANGE)
+												}
+				| expr SUPEG expr				{
+													// Instanciation of test quad
+													$$.vrai = l_create(nextquad);
+													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_GE, op1, op2, gt1);
+													gencode();
+													// Instanciation of goto quad
+													$$.faux = l_create(nextquad);
+													Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
+													gencode();
+												}
+				| expr INF expr					{
+													// Instanciation of test quad
+													$$.vrai = l_create(nextquad);
+													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_LT, op1, op2, gt1);
+													gencode();
+													// Instanciation of goto quad
+													$$.faux = l_create(nextquad);
+													Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
+													gencode();
+												}
+				| expr SUP expr					{
+													// Instanciation of test quad
+													$$.vrai = l_create(nextquad);
+													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_GT, op1, op2, gt1);
+													gencode();
+													// Instanciation of goto quad
+													$$.faux = l_create(nextquad);
+													Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
+													gencode();
+												}
+				| expr B_EGAL expr				{
+													// Instanciation of test quad
+													$$.vrai = l_create(nextquad);
+													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_EQ, op1, op2, gt1);
+													gencode();
+													// Instanciation of goto quad
+													$$.faux = l_create(nextquad);
+													Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
+													gencode();
+												}
+				| expr B_NEGAL expr				{
+													// Instanciation of test quad
+													$$.vrai = l_create(nextquad);
+													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
+													fillQuad(nextquad, Q_NE, op1, op2, gt1);
+													gencode();
+													// Instanciation of goto quad
+													$$.faux = l_create(nextquad);
+													Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
+													gencode();
+												}
 				| expr AND m expr				{
-												l_complete($1.vrai, $3);
-												$$.faux = l_concat($1.faux, $4.faux);
-												$$.vrai = $4.vrai;
+													l_complete($1.vrai, $3);
+													$$.faux = l_concat($1.faux, $4.faux);
+													$$.vrai = $4.vrai;
 												}
 				| expr OR m expr				{
-												l_complete($1.faux, $3);
-												$$.vrai = l_concat($1.vrai, $4.vrai);
-												$$.faux = $4.faux;
+													l_complete($1.faux, $3);
+													$$.vrai = l_concat($1.vrai, $4.vrai);
+													$$.faux = $4.faux;
 												}
 				| NON expr						{
-												$$.vrai = $2.faux;
-												$$.faux = $2.vrai;
+													$$.vrai = $2.faux;
+													$$.faux = $2.vrai;
 												}
 				| OPAR expr CPAR				{
-												$$ = $2;
+													$$ = $2;
 												}
 				;
-
-
-
-literal 		: int_literal 					{$$.intval = $1;} 
-				| BOOL							{printf("literal 3\n");}
-				| CHARLIT	 					{printf("literal 2\n");}
+literal 		: int_literal 					{
+													$$.intval = $1;
+												} 
+				| BOOL							{
+													printf("literal 3\n");
+												}
+				| CHARLIT	 					{
+													printf("literal 2\n");
+												}
 				;
-
-
-int_literal 	: DEC 							{$$ = yylval.constInt;}
-				| HEX							{printf("int_literal 2\n");}
+int_literal 	: DEC 							{
+													$$ = yylval.constInt;
+												}
+				| HEX							{
+													//$$ = (int)strtol(yylval.constString,NULL,0);
+												}
 				;
-
 g			: /*empty*/ 						{
-												$$.next = l_create(nextquad);
-												Quadop op1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
-												fillQuad(nextquad, Q_GOTO, op1, NULL, NULL);
-												gencode();
+													$$.next = l_create(nextquad);
+													Quadop op1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+													fillQuad(nextquad, Q_GOTO, op1, NULL, NULL);
+													gencode();
 												}
 			;
-
 m			: /*empty*/ 						{
-												$$ = nextquad;
+													$$ = nextquad;
 												}
 			;
 %%
-
-
 void yyerror (char *s) {fprintf (stderr, "error on symbol \"%s\"\n", s);}
-
 void gencode()
 {
 	globalCode = l_push(globalCode, nextquad);
 	nextquad = createQuad();
 }
-
 int main (int argc, char *argv[]) {
 	globalCode = l_init();
 	nextquad = createQuad();
