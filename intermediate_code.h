@@ -46,13 +46,13 @@ Quadruplet createQuad();
 void fillQuad(Quadruplet q, enum quad_type type, Quadop op1, Quadop op2, Quadop op3);
 
 
-Lquad initList();
-Lquad crelist(Quadruplet adresse);
-void printList(Liste l);
-void printQuad(Quadruplet q, Liste l);
-Liste push(Liste l, Quadruplet adresse);
-Liste concat(Liste l1, Liste l2);
-Liste complete(Liste l,Quadruplet adresse);
+Lquad l_init();
+Lquad l_create(Quadruplet adresse);
+void l_print(Lquad l);
+void printQuad(Quadruplet q, Lquad l);
+Lquad l_push(Lquad l, Quadruplet adresse);
+Lquad l_concat(Lquad l1, Lquad l2);
+Lquad l_complete(Lquad l,Quadruplet adresse);
 
 void gencode();
 Quadop newtemp();

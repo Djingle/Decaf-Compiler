@@ -11,19 +11,19 @@ void updateSymbolVal(char symbol, int val);
 extern FILE *yyin;
 int yydebug = 1;
 Quadruplet nextquad = NULL;
-Liste globalCode = NULL;
+Lquad globalCode = NULL;
 
 %}
 
 %union {
 	struct {
-		Liste vrai;
-		Liste faux;
+		Lquad vrai;
+		Lquad faux;
 		int intval;
 		Quadop result;
 	} exprval;
 	struct {
-		Liste next;
+		Lquad next;
 	} gt;
 	Quadruplet mr;
 	struct {
@@ -35,7 +35,7 @@ Liste globalCode = NULL;
 }
 
 %type <exprval> expr
-%type <gt> g statement block
+%type <gt> g statement statement_l block
 %type <mr> m
 %type <constLiteral> literal
 %type <constInt> int_literal
@@ -72,7 +72,7 @@ methoDecl_l		: methoDecl_l method_decl							{printf("method\n");}
 				;
 
 field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK	{printf("tabliste\n");}
-				| ID OSBRACK int_literal CSBRACK					{printf("tabfinliste\n");}
+				| ID OSBRACK int_literal CSBRACK					{printf("tabfinLquad\n");}
 				| field_elem COMMA ID								{printf("varliste\n");}
 				| ID												{printf("varfinliste\n");}
 				;
@@ -88,9 +88,7 @@ t_param 		: TYPE ID											{printf("param\n");}
 				;
 
 block 			: OBRACK t_varDecl t_statement CBRACK				{
-																	// printf("oui\n");
-																	// $$.next = crelist(nextquad);
-																	// printList($$.next);
+																	printf("la\n");
 																	}
 				;
 
@@ -110,34 +108,48 @@ t_statement 	: statement_l										{printf("statement\n");}
 		 		| /*empty*/											{printf("fin t_statement\n");}
 				;
 
-statement_l		: statement_l statement								{printf("statliste\n");}
-				| statement											{printf("finstatliste\n");}
+statement_l		: statement_l m statement							{$1.next = l_complete($1.next, $2);
+																	$$.next = $3.next;}
+				| statement											{$$.next = $1.next;}
 				;
 
 
-statement 		: location EGAL expr SEMICOL						{printf("statement 1a\n");}
-				| location PEGAL expr SEMICOL						{printf("statement 1b\n");}
+statement 		: location EGAL expr SEMICOL						{
+																	// J'AI MIS DES FAUX TRUCS POUR TESTER, JE LES LAISSE COMME ÇA TU PEUX TEST ET VOIR SI LES GOTO VONT AU BON ENDROIT
+																	printf("now\n");
+																	Quadop op1 = createQuadop(QO_CST, (u)1000);
+																	Quadop op2 = createQuadop(QO_CST, (u)1000);
+																	fillQuad(nextquad, Q_ADD, op1, op2, op1);
+																	gencode();
+																	}
+				| location PEGAL expr SEMICOL						{
+																	Quadop op1 = createQuadop(QO_CST, (u)2000);
+																	Quadop op2 = createQuadop(QO_CST, (u)2000);
+																	fillQuad(nextquad, Q_ADD, op1, op2, op1);
+																	gencode();}
 				| location MEGAL expr SEMICOL						{printf("statement 1b\n");}
 				| method_call SEMICOL								{printf("statement 2\n");}
-
 				| IF OPAR expr CPAR m block							{
-																	// printList(globalCode);
-																	// printf("Test :\n");
-																	complete($3.vrai, $5);
-																	// printList(globalCode);
-																	$6.next = initList();
-																	$$.next = concat($3.faux, $6.next);
-																	// printList(globalCode);
+																	printf("Test :\n");
+																	l_print(globalCode);
+																	$3.vrai = l_complete($3.vrai, $5);
+																	l_print(globalCode);
+																	$6.next = l_init();
+																	$$.next = l_concat($3.faux, $6.next);
+																	l_print(globalCode);
 																	}
 				| IF OPAR expr CPAR m block g ELSE m block			{
-																	complete($3.vrai, $5);
-																	complete($3.faux, $9);
-																	$$.next = concat($6.next, concat($7.next, $10.next));
+																	l_complete($3.vrai, $5);
+																	l_complete($3.faux, $9);
+																	$6.next = l_init();
+																	$7.next = l_init();
+																	$10.next = l_init();
+																	$$.next = l_concat($6.next, l_concat($7.next, $10.next));
 																	}
 
 				
-				| FOR ID EGAL expr {g} COMMA expr block					{
-																	    // complete($7.next,nextquad);
+				| FOR ID EGAL expr COMMA expr block					{
+																	    // l_complete($7.next,nextquad);
 																		// Quadop gt1 = createQuadop(QO_ADD, (u)(Quadruplet)NULL);
 																		//Quadop op1 = createQuadop(QO_CST, (u)$2.intval);
 																		//Quadop op2 = createQuadop(QO_CST, (u)1);
@@ -146,7 +158,7 @@ statement 		: location EGAL expr SEMICOL						{printf("statement 1a\n");}
 																		// Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
 																		// fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
 																		// gencode();
-																		// $$.next = crelist($TODO);
+																		// $$.next = l_create($TODO);
 																	}
 				| RETURN SEMICOL									{printf("statement 6\n");}
 				| RETURN expr SEMICOL								{printf("statement 7\n");}
@@ -185,14 +197,14 @@ expr 			: location 						{printf("expr 1\n");}
 
 				| expr INFEG expr				{
 												// Instanciation of test quad
-												$$.vrai = crelist(nextquad);
+												$$.vrai = l_create(nextquad);
 												Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
 												Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 												Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 												fillQuad(nextquad, Q_LE, op1, op2, gt1);
 												gencode();
 												// Instanciation of goto quad
-												$$.faux = crelist(nextquad);
+												$$.faux = l_create(nextquad);
 												Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
 												fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
 												gencode();
@@ -205,13 +217,13 @@ expr 			: location 						{printf("expr 1\n");}
 				| expr B_NEGAL expr				{printf("NEG\n");}
 				
 				| expr AND m expr				{
-												complete($1.vrai, $3);
-												$$.faux = concat($1.faux, $4.faux);
+												l_complete($1.vrai, $3);
+												$$.faux = l_concat($1.faux, $4.faux);
 												$$.vrai = $4.vrai;
 												}
 				| expr OR m expr				{
-												complete($1.faux, $3);
-												$$.vrai = concat($1.vrai, $4.vrai);
+												l_complete($1.faux, $3);
+												$$.vrai = l_concat($1.vrai, $4.vrai);
 												$$.faux = $4.faux;
 												}
 				| NON expr						{
@@ -225,18 +237,18 @@ expr 			: location 						{printf("expr 1\n");}
 
 
 
-literal 		: int_literal 					{ printf("1\n"); $$.intval = $1; printf("2\n");} 
+literal 		: int_literal 					{$$.intval = $1;} 
 				| BOOL							{printf("literal 3\n");}
 				| CHARLIT	 					{printf("literal 2\n");}
 				;
 
 
-int_literal 	: DEC 							{ printf("3\n"); $$ = yylval.constInt; printf("4\n"); }
+int_literal 	: DEC 							{$$ = yylval.constInt;}
 				| HEX							{printf("int_literal 2\n");}
 				;
 
 g			: /*empty*/ 						{
-												$$.next = crelist(nextquad);
+												$$.next = l_create(nextquad);
 												Quadop op1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
 												fillQuad(nextquad, Q_GOTO, op1, NULL, NULL);
 												gencode();
@@ -254,19 +266,19 @@ void yyerror (char *s) {fprintf (stderr, "error on symbol \"%s\"\n", s);}
 
 void gencode()
 {
-	push(globalCode, nextquad);
+	globalCode = l_push(globalCode, nextquad);
 	nextquad = createQuad();
 }
 
 int main (int argc, char *argv[]) {
-	globalCode = initList();
+	globalCode = l_init();
 	nextquad = createQuad();
 	FILE *fp;
 	if (argc == 1) fp = fopen("test1.txt", "r");
 	else fp = fopen(argv[1], "r");
 	yyin = fp;
 	yyparse();
-	printf("\n\nFINAL PRINTLIST\n");
-	printList(globalCode);
+	printf("\n\nFINAL l_print\n");
+	l_print(globalCode);
 	return 0;
 }
