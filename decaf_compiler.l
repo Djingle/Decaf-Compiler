@@ -52,7 +52,7 @@ CHAR [a-zA-Z]|" "|"\n"
 "!"                     {return NON;}
 "&&"                    {return AND;}
 "||"                    {return OR;}
-{TYPE}                  {return TYPE;}
+{TYPE}                  {yylval.constString = yytext;return TYPE;}
 "true"|"false"          {return BOOL;}
 "0x"{HEX_DIG}{HEX_DIG}* { yylval.constString = yytext; return HEX;}
 {DIG}{DIG}*             { yylval.constInt = atoi(yytext); return DEC;}
@@ -64,7 +64,7 @@ CHAR [a-zA-Z]|" "|"\n"
 "return"                {return RETURN;}
 "break"                 {return BREAK;}
 "continue"              {return CONTINUE;}
-{ID}                    {return ID;}
+{ID}                    {yylval.constString = yytext;return ID;}
 
 \'{CHAR}\'              {
         // int temp = yytext[0];

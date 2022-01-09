@@ -165,14 +165,14 @@ void printAllVars(){
 }
 int main(){
     newVariable("temp", "int");
-    setVal("temp1", (operand_val)0);
-    setVal("temp", (operand_val)13);
+    setVal("temp1", "0");
+    setVal("temp", "13");
     pushctx();
     newVariable("temp10", "bool");
-    setVal("temp10", (operand_val)0);
+    setVal("temp10", "false");
     TwonewVariable("temp2", "temp3", "int");
-    setVal("temp2", (operand_val)25);
-    setVal("temp3", (operand_val)13);
+    setVal("temp2", "25");
+    setVal("temp3", "13");
     newVariable("tempdff", "float");
     printAllVars();
     return 1;
