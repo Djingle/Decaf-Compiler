@@ -135,38 +135,38 @@ Liste complete(Liste l,Quadruplet adresse){
     return l;
 }
 
-// int main(){
-//     //LIST OPERATIONS TESTS
-//     printf("I: Quadop, Quad and List Instanciations tests\n");
-//     Quadop op1 = createQuadop(QO_CST, (u)3);
-//     Quadop op2 = createQuadop(QO_CST, (u)5);
-//     Quadop op3 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
-//     Quadop op4 = createQuadop(QO_CST, (u)3);
-//     Quadop op5 = createQuadop(QO_CST, (u)3);
-//     Quadop op6 = createQuadop(QO_CST, (u)3);
+int main(){
+    //LIST OPERATIONS TESTS
+    printf("I: Quadop, Quad and List Instanciations tests\n");
+    Quadop op1 = createQuadop(QO_CST, (u)3);
+    Quadop op2 = createQuadop(QO_CST, (u)5);
+    Quadop op3 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+    Quadop op4 = createQuadop(QO_CST, (u)3);
+    Quadop op5 = createQuadop(QO_CST, (u)3);
+    Quadop op6 = createQuadop(QO_CST, (u)3);
 
-//     Quadruplet q1 = createQuad(Q_ADD,op1,op2,op3);
-//     Quadruplet q2 = createQuad(Q_SUB,op3,op4,op5);
-//     Quadruplet q3 = createQuad(Q_MUL,op4,op5,op6);
-//     Liste l = crelist(q1);
-//     l = push(l,q2);
-//     l = push(l,q3);
-//     printList(l);
+    Quadruplet q1 = createQuad(Q_ADD,op1,op2,op3);
+    Quadruplet q2 = createQuad(Q_SUB,op3,op4,op5);
+    Quadruplet q3 = createQuad(Q_MUL,op4,op5,op6);
+    Liste l = crelist(q1);
+    l = push(l,q2);
+    l = push(l,q3);
+    printList(l);
 
-//     //Complete function tests
-//     printf("\n\nII: Complete tests\n");
-//     Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
-//     Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
-//     // Warning: quadops are pointers, so if you want 2 quads to have 2 different gotos, define 2 quadops.
+    //Complete function tests
+    printf("\n\nII: Complete tests\n");
+    Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+    Quadop gt2 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
+    // Warning: quadops are pointers, so if you want 2 quads to have 2 different gotos, define 2 quadops.
 
-//     Quadruplet q4 = createQuad(Q_LT, op1, op2, gt1);
-//     Quadruplet q5 = createQuad(Q_GOTO, gt2, NULL, NULL);
-//     Liste l2 = crelist(q5);
-//     l2 = push(l2, q4);
-//     printf("before complete :\n");
-//     printList(l2);
-//     l2 = complete(l2, q3);
-//     printf("after complete :\n");
-//     printList(l2);
-//     return EXIT_SUCCESS;
-// }
+    Quadruplet q4 = createQuad(Q_LT, op1, op2, gt1);
+    Quadruplet q5 = createQuad(Q_GOTO, gt2, NULL, NULL);
+    Liste l2 = crelist(q5);
+    l2 = push(l2, q4);
+    printf("before complete :\n");
+    printList(l2);
+    l2 = complete(l2, q3);
+    printf("after complete :\n");
+    printList(l2);
+    return EXIT_SUCCESS;
+}
