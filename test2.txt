@@ -1,6 +1,6 @@
 class Program {
     void main() {
-        if((1+2)==3){
+        if(5+(1+2)==3){
             a = 3;
         }
         a += 2;

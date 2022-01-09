@@ -10,10 +10,13 @@ int symbols[52];
 int symbolVal(char symbol);
 void updateSymbolVal(char symbol, int val);
 extern FILE *yyin;
+FILE* out;
 int yydebug = 1;
 Quadruplet nextquad = NULL;
 Lquad globalCode = NULL;
 %}
+
+
 %union {
 	struct {
 		Lquad vrai;
@@ -171,7 +174,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		printf("statement 1b\n");
 																		//decrementVar($1,atoi($3.stringval));
 																	}
-					| method_call SEMICOL							{
+				| method_call SEMICOL								{
 																		printf("statement 2\n");
 																		//execFct($1);				//TODO
 																	}
@@ -244,7 +247,7 @@ location 		: ID 							{
 												}
 				;
 expr 			: location 						{	
-													$$.intval=atoi($1);			
+													$$.intval=atoi($1);
 												}
 				| method_call 					{	
 													/*$$.val=execFct($1);*/		  //TODO
