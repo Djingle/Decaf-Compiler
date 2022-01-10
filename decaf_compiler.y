@@ -282,8 +282,6 @@ expr 			: location 						{
 													Quadop op3 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
 													fillQuad(nextquad, Q_ASSIGN_TEMP_ID, op1, op2, op3);
 													gencode();
-													//$$.intval=getVal($1); // Recherche dans la table des symboles pour trouver la valeur de la variable à l'adresse location
-													//$$.intval=atoi($1.constString); 
 												}
 				| method_call 					{	// $$.type = 0; 
 													//$$.val=execFct($1);	  //TODO
@@ -556,8 +554,29 @@ int main (int argc, char *argv[]) {
 	globalCode = l_init();
 	nextquad = createQuad();
 	FILE *fp;
+	char* outputFile = "output.mips";
 	if (argc == 1) fp = fopen("test2.txt", "r");
-	else fp = fopen(argv[1], "r");
+	else{
+		fp = fopen(argv[1], "r");
+		if (fp == NULL) {
+			printf("File not found\n");
+			return 0;
+		}
+		if(argc >= 3){
+			for(int i=2; i<argc; i++){
+				if(!strcmp(argv[i], "-o")){
+					i++;
+					outputFile = argv[i];
+				} else if (!strcmp(argv[i],"-version"))
+					printf("Version 1.0\n");
+				//else if (strcmp(argv[i], "-tos"))
+					//printTos();
+				else
+					printf("Unknow option %s\n", argv[i]);
+			}
+		}
+	} 
+
 	yyin = fp;
 	yyparse();
 	printf("\n\nFINAL l_print\n");
