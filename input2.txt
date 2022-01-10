@@ -5,7 +5,7 @@ class Program {
             nombre = 1;
             if (nombre == 1) {
                 int a;
-                a = 1;
+                a = 5 + 8+nombre;
             }
     }
 }
