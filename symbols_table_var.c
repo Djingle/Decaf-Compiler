@@ -2,6 +2,7 @@
 #include <string.h>
 tempvar *templist = NULL; 
 Scope *pile = NULL;
+int current = 0; // current est la derniere adresse utilisee
 void pushctx(){
     Scope *temp = (Scope*)malloc(sizeof(Scope));
     temp->parent = pile;
@@ -39,10 +40,15 @@ void newVar(char* type){
     if(!pile)
         pushctx();
     tempvar *temp = templist;
-    while(temp){
-        if(lookup(temp->name)){
-            printf("attempting to redefine the variable \"%s\"\n", temp->name);
-            return;    
+   
+    while(temp){    
+        variable *v = pile->entries;
+        while(v){
+            if(!strcmp(v->name, temp->name)){
+                printf("%s is already declared\n",v->name);
+                return;
+            }
+            v = v->next;
         }
         operand_type temp_type;
         if(!strcmp(type, "int"))
@@ -56,29 +62,18 @@ void newVar(char* type){
         variable *newEntree = (variable*)malloc(sizeof(variable));
         newEntree->next = pile->entries;
         strcpy(newEntree->name, temp->name);
+        newEntree->adresse = current;  // current est la derniere adresse utilisee
+        current += 4;   
         newEntree->type = temp_type;
         pile->entries = newEntree;
         temp = temp->next;
     }
+    
     clearListVar();
 }
 
-void setValUtil(variable *s, operand_val val){
-    switch(s->type){
-        case OP_INT:
-            s->value.ival = val.ival;
-            break;
-        case OP_BOOL:
-            s->value.bool_val = val.bool_val;
-            break;
-    }
-}
-int myatoi(char *val){
-    int len = strlen(val);
-    /*for(int i=0;i<len;i++){
-        if()
-    }*/
-}
+
+/*
 variable *setVal(char *name, char* val){
     printf("attempting setVal with name = \"%s\" and val = \"%s\" ", name, val);
     if(pile == NULL)
@@ -88,19 +83,8 @@ variable *setVal(char *name, char* val){
         variable *compteur = c->entries;
         while(compteur){
         if(!strcmp(compteur->name, name)){
-            switch(compteur->type){
-                case OP_INT:
-                    compteur->value.ival = atoi(val);///A CHANGER -----------------------
-                    break;
-                case OP_BOOL:
-                    if(!strcmp(val, "false"))
-                        compteur->value.bool_val = 0;
-                    else if(!strcmp(val, "true"))
-                        compteur->value.bool_val = 1;
-                    else
-                        printf("%s is not boolean\n", val);
-                    break;
-            }
+            compteur->adresse = current;  // current est la derniere adresse utilisee (a definir en glbal)
+            current += 4;         
             return compteur;
             }
             compteur = compteur->next;
@@ -109,6 +93,24 @@ variable *setVal(char *name, char* val){
     }
     printf("%s is not declared\n", name);
     return NULL;
+}*/
+
+int getAdrr(char *name){
+    printf("attempting to get adresse of name = \"%s\" ", name);
+    if(pile == NULL)
+        return -1;
+    Scope *c = pile;
+    while(c){
+        variable *compteur = c->entries;
+        while(compteur){
+        if(!strcmp(compteur->name, name))
+            return compteur->adresse;  
+        compteur = compteur->next;
+        }
+        c = c->parent;
+    }
+    printf("getVal(): %s is not declared\n", name);
+    return -1;
 }
 
 variable* lookup(char *name){
@@ -128,6 +130,12 @@ variable* lookup(char *name){
 }
 
 
+
+
+
+
+
+
 // FONCTIONS DE TEST
 
 void newVariable(char *name, char *type){
@@ -140,21 +148,7 @@ void TwonewVariable(char *name1, char*name2 , char *type){
     newVar(type);
 }
 void printVar(variable var){
-    printf("%s = ", var.name);
-
-    switch (var.type)
-    {
-    case OP_INT:
-        printf("%d ", var.value.ival);
-        break;
-    case OP_BOOL:
-        printf(var.value.bool_val?"true ":"false ");
-        break;
-    default:
-        printf("TYPE ERROR");
-        break;
-    }
-    printf("\n");
+    printf("%s a l'adresse %d\n", var.name, var.adresse);
 }
 void printAllVars(){
     Scope *c = pile;
@@ -195,20 +189,22 @@ char* convertIntegerToChar(int n)
     return (char*)arr;
 }
 
-/*
+
 int main(){
     newVariable("temp", "int");
-    setVal("temp1", "0");
-    setVal("temp", "13");
+    newVariable("temp10", "int");
+
+    //setVal("temp1", "0");
+    //setVal("temp", "13");
     pushctx();
+    printf("\ntemp10 getAdrr() %d\n", getAdrr("temp10"));
     newVariable("temp10", "bool");
-    setVal("temp10", "false");
+    //setAdrgetAdrr("temp10", "false");
     TwonewVariable("temp2", "temp3", "int");
-    setVal("temp2", "25");
-    setVal("temp3", "13");
+    //setAdrgetAdrr("temp2", "25");
+    //setAdrgetAdrr("temp3", "13");
     newVariable("tempdff", "float");
+    printf("\ntemp111 getAdrr() %d\n", getAdrr("temp111"));
     printAllVars();
     return 1;
 }
-
-*/

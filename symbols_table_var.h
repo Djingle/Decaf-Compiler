@@ -13,14 +13,17 @@ typedef union operand_val operand_val;
 typedef enum operand_type {
     OP_INT, OP_BOOL
 } operand_type;
+
 typedef struct entry{
     operand_type type;
     char name[32];
-    union operand_val {
+/*    union operand_val {
         int ival;
         float fval;
         int bool_val;
     } value;
+    */
+    int adresse;
     struct entry *next;
 } variable;
 
@@ -36,8 +39,8 @@ void pushctx();
 void popctx();
 Scope *currentctx();
 void newVar(char *);
-variable *setVal(char *, char *);
-void setValUtil(variable *, operand_val);
+//variable *setVal(char *, char *);
+int getVal(char *);
 variable* lookup(char *);
 char* convertIntegerToChar(int n);
 

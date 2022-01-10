@@ -53,7 +53,7 @@ CHAR [a-zA-Z]|" "|"\n"
 "&&"                    {return AND;}
 "||"                    {return OR;}
 {TYPE}                  {yylval.constString = yytext;return TYPE;}
-"true"|"false"          {return BOOL;}
+"true"|"false"          {yylval.constString = yytext;return BOOL;}
 "0x"{HEX_DIG}{HEX_DIG}* { yylval.constString = yytext; return HEX;}
 {DIG}{DIG}*             { yylval.constString =yytext; return DEC;}
 ";"                     {return SEMICOL;}
@@ -64,7 +64,9 @@ CHAR [a-zA-Z]|" "|"\n"
 "return"                {return RETURN;}
 "break"                 {return BREAK;}
 "continue"              {return CONTINUE;}
-{ID}                    {yylval.constString = yytext;return ID;}
+{ID}                    {
+    printf("ID detected: %s\n", yytext);
+    yylval.constString = yytext;return ID;}
 
 \'{CHAR}\'              {
         // int temp = yytext[0];
