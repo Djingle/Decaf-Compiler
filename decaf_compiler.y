@@ -4,7 +4,7 @@ int yylex();
 #include <stdio.h>     /* C declarations used in actions */
 #include <stdlib.h>
 #include <stdbool.h>
-#include<string.h>
+#include <string.h>
 #include "symbols_table_var.h"
 #include "intermediate_code.h"
 #include "utility.h"
@@ -205,21 +205,41 @@ statement 		: location EGAL expr SEMICOL						{
 																		printf("statement 2\n");
 																		//execFct($1);				//TODO
 																	}
-				| READ OPAR location CPAR SEMICOL 						{
-																		
+				| READ OPAR location CPAR SEMICOL 					{	
+																		if(getType($3) != OP_INT){
+																			//error et exit
+																		}
 																		Quadop op1 = createQuadop(QO_CST, (u)getVal($3));
 																		Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
-																		fillQuad(nextquad, Q_SUB, op1, op2, op2);
+																		fillQuad(nextquad, Q_READ, op1, op2, op2);
 																		gencode();
 																	}
 				| WRITEINT OPAR expr CPAR SEMICOL 					{
-
+																		if($3.type){
+																			//error et exit
+																		}
+																		Quadop op1 = createQuadop(QO_CST, (u)$3.intval);
+																		Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+																		fillQuad(nextquad, Q_WRITEINT, op1, op2, op2);
+																		gencode();
 																	}
 				| WRITEBOOL OPAR expr CPAR SEMICOL 					{
-
+																		if($3.type != 1){
+																			//error et exit
+																		}
+																		Quadop op1 = createQuadop(QO_CST, (u)$3.intval);
+																		Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+																		fillQuad(nextquad, Q_WRITEBOOL, op1, op2, op2);
+																		gencode();
 																	}
-				| WRITESTRING OPAR expr CPAR SEMICOL 					{
-
+				| WRITESTRING OPAR expr CPAR SEMICOL 				{
+																		if($3.type != 0){
+																			//error et exit
+																		}
+																		Quadop op1 = createQuadop(QO_CST, (u)$3.intval);
+																		Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+																		fillQuad(nextquad, Q_WRITESTRING, op1, op2, op2);
+																		gencode();
 																	}
 				| IF OPAR expr CPAR m block							{
 																		printf("Test :\n");

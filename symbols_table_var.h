@@ -47,6 +47,7 @@ adresselist* newVar(char *);
 int newtempvar();
 //variable *setVal(char *, char *);
 int getVal(char *);
+int getType(char *);
 variable* lookup(char *);
 char* convertIntegerToChar(int n);
 void printAllVars();

@@ -137,6 +137,24 @@ int getVal(char *name){
     printf("getVal(): %s is not declared\n", name);
     return -1;
 }
+int getType(char *name){
+    printf("attempting to get type of name = \"%s\" ", name);
+    if(pile == NULL)
+        return -1;
+    Scope *c = pile;
+    while(c){
+        variable *compteur = c->entries;
+        while(compteur){    tempvar *temp = templist;
+
+        if(!strcmp(compteur->name, name))
+            return compteur->type;  
+        compteur = compteur->next;
+        }
+        c = c->parent;
+    }
+    printf("getType(): %s is not declared\n", name);
+    return -1;
+}
 
 variable* lookup(char *name){
     if(pile == NULL)

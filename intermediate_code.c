@@ -304,12 +304,13 @@ void l_translate(Lquad l, FILE* out)
             case Q_READ:
                 fprintf(out, "  li $v0, 5\n");
                 fprintf(out, "  syscall\n");
-                // fprintf(out, "li $t0, %d\n", save->q->op1->value.cst);
-                // fprintf(out, "sw $v0, temp($t0)\n");
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  sw $v0, var($t0)\n");
                 break;
             case Q_WRITEINT:
                 fprintf(out, "  li $v0, 1\n");
-                fprintf(out, "  li $a0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  lw $a0, temp($t0)\n");
                 fprintf(out, "  syscall\n");
                 break;
             // case Q_WRITESTRING:
@@ -317,14 +318,14 @@ void l_translate(Lquad l, FILE* out)
             //     fprintf(out, "la $a0, %s\n", save->q->op1->value.string);
             //     fprintf(out, "syscall\n");
             //     break;
-            case Q_WRITEBOOL:
-                fprintf(out, "  li $v0, 4\n");
-                if(save->q->op1->value.cst == 1)
-                    fprintf(out, "  la $a0, true\n");
-                else
-                    fprintf(out, "  la $a0, false\n");
-                fprintf(out, "  syscall\n");
-                break;
+            // case Q_WRITEBOOL:
+            //     fprintf(out, "  li $v0, 4\n");
+            //     if(save->q->op1->value.cst == 1)
+            //         fprintf(out, "  la $a0, true\n");
+            //     else
+            //         fprintf(out, "  la $a0, false\n");
+            //     fprintf(out, "  syscall\n");
+            //     break;
         }
         nblock++;
         save = save->next;
@@ -334,7 +335,7 @@ void l_translate(Lquad l, FILE* out)
         li  $v0, 10
         syscall
     */
-    fprintf(out, "  exit:\n\tli  $v0, 10\n\tsyscall\n");
+    fprintf(out, "exit:\n  li  $v0, 10\n  syscall\n");
 }
 // temp: 40  
 // variable: 80
