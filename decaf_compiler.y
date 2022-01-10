@@ -128,10 +128,12 @@ var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{
 				;
 var_elem		: ID												{	
 																		listvar($1);
+																		printf("ID detected in Grammar %s\n", $1);
 																		//pushVar($1.constString);
 																	}
 				| var_elem COMMA ID									{	
 																		listvar($3);
+																		printf("ID detected in Grammar %s\n", $3);
 																		//pushVar($3.constString);
 																	}
 
@@ -236,6 +238,7 @@ t_expr 			: expr 							{
 												}
 				;
 location 		: ID 							{
+													printf("ID detected in grammar %s\n", $1);
 													$$ = $1;
 													printf("location 1\n");
 												}
@@ -401,6 +404,11 @@ literal 		: int_literal 					{
 													$$.stringval = $1;
 												} 
 				| BOOL							{
+													if(!strcmp(yylval.constString, "false"))
+														$.stringval = "0";		
+													else
+														$.stringval = "1";
+												}
 													printf("literal 3\n");
 												}
 				| CHARLIT	 					{
@@ -433,6 +441,7 @@ void gencode()
 	nextquad = createQuad();
 }
 int main (int argc, char *argv[]) {
+	
 	globalCode = l_init();
 	nextquad = createQuad();
 	FILE *fp;
