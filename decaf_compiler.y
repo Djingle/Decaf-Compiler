@@ -181,6 +181,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 																		fillQuad(nextquad, Q_ASSIGN, op1, op2, op1);
 																		gencode();
+																		$$.next = l_create(nextquad);
 																	}
 				| location PEGAL expr SEMICOL						{
 																		Quadop op1 = createQuadop(QO_CST, (u)getVal($1));
@@ -189,6 +190,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		gencode();
 																		printf("statement 1a\n");
 																		//incrementVar($1,atoi($3.stringval)); /// FROM AYOUB
+																		$$.next = l_create(nextquad);
 																	}
 				| location MEGAL expr SEMICOL						{	
 																		Quadop op1 = createQuadop(QO_CST, (u)getVal($1));
@@ -197,6 +199,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		gencode();
 																		printf("statement 1b\n");
 																		//decrementVar($1,atoi($3.stringval));
+																		$$.next = l_create(nextquad);
 																	}
 				| method_call SEMICOL								{
 																		printf("statement 2\n");
