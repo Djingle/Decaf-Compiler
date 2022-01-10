@@ -1,0 +1,10 @@
+class Program{
+    void main(){
+        int b = 3;
+        bool a;
+        a = true;
+        if(a == true){
+            WriteInt(b);
+        }
+    }
+}

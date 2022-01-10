@@ -1,0 +1,12 @@
+class Program {
+    void main() {
+        int a;
+        int b;
+        a = 9/3;
+        b = a+1*2;
+        if(a == 3){
+            WriteInt(a);
+        }
+        WriteInt(b);
+    }
+}

@@ -1,0 +1,11 @@
+class Program {
+    int oui;
+    bool non;
+    int fonction(){
+        return 3;
+    } // LES DÉFINITIONS DE FONCTIONS DE MARCHENT PAS
+    void main {
+        int bonjour;
+        bonjour = fonction(); // LES APPELS DE FONCTION NON PLUS
+    }
+}

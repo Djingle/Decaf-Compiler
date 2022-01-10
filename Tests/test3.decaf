@@ -1,0 +1,8 @@
+class Program{
+    void main(){
+        int val;
+        val = 3;
+        val += 5; //PLUS EGAL NE MARCHE PAS
+        WriteInt(val);
+    }
+}
