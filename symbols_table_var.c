@@ -41,7 +41,6 @@ void clearListVar(){
 
 adresselist* newVar(char* type){
     adresselist *adlist = NULL;
-    printf("attempting newVar with %s\n",type);
     if(!pile)
         pushctx();
     tempvar *temp = templist;
@@ -76,8 +75,6 @@ adresselist* newVar(char* type){
     }
     
     clearListVar();
-    printf("\npour le moment on a les variables suivant\n");
-    printAllVars();
     return adlist;
 }
 
@@ -120,7 +117,6 @@ variable *setVal(char *name, char* val){
 }*/
 
 int getVal(char *name){
-    printf("attempting to get adresse of name = \"%s\" ", name);
     if(pile == NULL)
         return -1;
     Scope *c = pile;
@@ -134,11 +130,10 @@ int getVal(char *name){
         }
         c = c->parent;
     }
-    printf("getVal(): %s is not declared\n", name);
+    printf("%s is not declared\n", name);
     return -1;
 }
 int getType(char *name){
-    printf("attempting to get type of name = \"%s\" ", name);
     if(pile == NULL)
         return -1;
     Scope *c = pile;
@@ -152,7 +147,7 @@ int getType(char *name){
         }
         c = c->parent;
     }
-    printf("getType(): %s is not declared\n", name);
+    printf("%s is not declared\n", name);
     return -1;
 }
 

@@ -66,7 +66,7 @@ Lquad globalCode = NULL;
 
 %%
 program   		: CLASSPRO OBRACK t_fielDecl t_methoDecl CBRACK		{
-																		printf("program\n");
+																		
 																	}
 				;
 t_fielDecl		: t_fielDecl TYPE field_elem SEMICOL				{	// SEUL LE CAS OÛ 	field_elem -> ID
@@ -83,15 +83,15 @@ t_fielDecl		: t_fielDecl TYPE field_elem SEMICOL				{	// SEUL LE CAS OÛ 	field_
 				| /*empty*/											{}
 				;
 t_methoDecl 	: methoDecl_l										{
-																		printf("t_methoDecl\n");
+																		
 																	}
 				| /*empty*/											{}
 				;
 methoDecl_l		: methoDecl_l method_decl							{
-																		printf("method\n");
+																		
 																	}
 				| method_decl										{
-																		printf("method\n");
+																		
 																	}
 				;
 field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK	{} 							
@@ -120,11 +120,11 @@ t_param 		: TYPE ID											{
 																	}
 				;
 block 			: OBRACK t_varDecl t_statement CBRACK				{
-																		printf("la\n");
+																	
 																	}
 				;
 t_varDecl		: var_decl_l										{
-																		printf("t_varDecl\n");
+																		
 																	}
 				| /*empty*/ 										{}
 				;
@@ -174,7 +174,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		//ADRESSE de expr dans tab2
 																		// J'AI MIS DES FAUX TRUCS POUR TESTER, JE LES LAISSE COMME ÇA TU PEUX TEST ET VOIR SI LES GOTO VONT AU BON ENDROIT
 																		// Je suis pas tres sur de ce que j'ai ecrit avant le gencode, please check before use
-																		printf("now\n");
+																	
 																		//setVal($1,convertIntegerToChar($3.intval)); 	// FROM AYOUB
 																		//setVar($1,$3.val); 	// FROM AYOUB
 																		Quadop op1 = createQuadop(QO_CST, (u)getVal($1));
@@ -188,7 +188,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 																		fillQuad(nextquad, Q_ADD, op1, op2, op1);
 																		gencode();
-																		printf("statement 1a\n");
+																	
 																		//incrementVar($1,atoi($3.stringval)); /// FROM AYOUB
 																		$$.next = l_create(nextquad);
 																	}
@@ -197,17 +197,17 @@ statement 		: location EGAL expr SEMICOL						{
 																		Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 																		fillQuad(nextquad, Q_SUB, op1, op2, op1);
 																		gencode();
-																		printf("statement 1b\n");
+																		
 																		//decrementVar($1,atoi($3.stringval));
 																		$$.next = l_create(nextquad);
 																	}
 				| method_call SEMICOL								{
-																		printf("statement 2\n");
+																		
 																		//execFct($1);				//TODO
 																	}
 				| READ OPAR location CPAR SEMICOL 					{	
 																		if(getType($3) != OP_INT){
-																			//error et exit
+																			printf("incompatible types\n");
 																		}
 																		Quadop op1 = createQuadop(QO_CST, (u)getVal($3));
 																		Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
@@ -216,8 +216,9 @@ statement 		: location EGAL expr SEMICOL						{
 																	}
 				| WRITEINT OPAR expr CPAR SEMICOL 					{
 																		if($3.type){
-																			//error et exit
+																			printf("incompatible types\n");
 																		}
+																		$$.next = l_create(nextquad);
 																		Quadop op1 = createQuadop(QO_CST, (u)$3.intval);
 																		Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
 																		fillQuad(nextquad, Q_WRITEINT, op1, op2, op2);
@@ -225,34 +226,25 @@ statement 		: location EGAL expr SEMICOL						{
 																	}
 				| WRITEBOOL OPAR expr CPAR SEMICOL 					{
 																		if($3.type != 1){
-																			//error et exit
+																			printf("incompatible types\n");
 																		}
+																		$$.next = l_create(nextquad);
 																		Quadop op1 = createQuadop(QO_CST, (u)$3.intval);
 																		Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
 																		fillQuad(nextquad, Q_WRITEBOOL, op1, op2, op2);
 																		gencode();
 																	}
-				| WRITESTRING OPAR expr CPAR SEMICOL 				{
-																		if($3.type != 0){
-																			//error et exit
-																		}
-																		Quadop op1 = createQuadop(QO_CST, (u)$3.intval);
-																		Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
-																		fillQuad(nextquad, Q_WRITESTRING, op1, op2, op2);
-																		gencode();
+				| WRITESTRING OPAR CPAR SEMICOL 					{
+																		// Quadop op1 = createQuadop(QO_CST, (u)$3);
+																		// Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+																		// fillQuad(nextquad, Q_WRITESTRING, op1, op2, op2);
+																		// gencode();
 																	}
 				| IF OPAR expr CPAR m block							{
-																		printf("Test :\n");
-																		l_print(globalCode);
-																		l_print($3.vrai);
 																		$3.vrai = l_complete($3.vrai, $5);
-																		printf("AVANT :\n");
-																		l_print(globalCode);
 																		int type;
 				                                                        $6.next = l_init();
 																		$$.next = l_concat($3.faux, $6.next);
-																		printf("APRES :\n");
-																		l_print(globalCode);
 																	}
 				| IF OPAR expr CPAR m block g ELSE m block			{
 																		l_complete($3.vrai, $5);
@@ -304,10 +296,10 @@ t_expr 			: expr 							{
 				;
 location 		: ID 							{		
 													$$ = copystr($1); //$$.constString = $1;
-													printf("location 1\n");
+													
 												}
 				| ID OSBRACK expr CSBRACK		{
-													printf("location 2\n");
+												
 												}
 				;
 expr 			: location 						{	  
@@ -336,7 +328,6 @@ expr 			: location 						{
 														//error and exit
 													}
 													$$.type = 0;
-													printf("On est là\n");
 													$$.intval = $1.intval;
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
@@ -406,7 +397,7 @@ expr 			: location 						{
 												}
 				| expr INFEG expr				{	
 													if($1.type !=  $3.type){
-														//error et exit
+														printf("incompatible types\n");
 printf("cannot perform operation with current type(s)\n");
 
 													}
@@ -427,7 +418,7 @@ printf("cannot perform operation with current type(s)\n");
 												}
 				| expr SUPEG expr				{	
 													if($1.type !=  $3.type){
-														//error et exit
+														printf("incompatible types\n");
 printf("cannot perform operation with current type(s)\n");
 
 													}
@@ -447,7 +438,7 @@ printf("cannot perform operation with current type(s)\n");
 												}
 				| expr INF expr					{	
 													if($1.type !=  $3.type){
-														//error et exit
+														printf("incompatible types\n");
 printf("cannot perform operation with current type(s)\n");
 
 													}
@@ -467,7 +458,7 @@ printf("cannot perform operation with current type(s)\n");
 												}
 				| expr SUP expr					{	
 													if($1.type !=  $3.type){
-														//error et exit
+														printf("incompatible types\n");
 printf("cannot perform operation with current type(s)\n");
 
 													}
@@ -487,7 +478,7 @@ printf("cannot perform operation with current type(s)\n");
 												}
 				| expr B_EGAL expr				{	
 													if($1.type !=  $3.type){
-														//error et exit
+														printf("incompatible types\n");
 printf("cannot perform operation with current type(s)\n");
 
 													}
@@ -507,7 +498,7 @@ printf("cannot perform operation with current type(s)\n");
 												}
 				| expr B_NEGAL expr				{	
 													if($1.type !=  $3.type){
-														//error et exit
+														printf("incompatible types\n");
 printf("cannot perform operation with current type(s)\n");
 
 													}
@@ -527,7 +518,7 @@ printf("cannot perform operation with current type(s)\n");
 												}
 				| expr AND m expr				{
 													if($1.type != 1 || $4.type != 1){
-														//error et exit
+														printf("incompatible types\n");
 printf("cannot perform operation with current type(s)\n");
 
 													}
@@ -538,7 +529,7 @@ printf("cannot perform operation with current type(s)\n");
 												}
 				| expr OR m expr				{
 													if($1.type != 1 || $4.type != 1){
-														//error et exit
+														printf("incompatible types\n");
 printf("cannot perform operation with current type(s)\n");
 
 													}
@@ -549,7 +540,7 @@ printf("cannot perform operation with current type(s)\n");
 												}
 				| NON expr						{
 													if($2.type != 1){
-														//error et exit
+														printf("incompatible types\n");
 printf("cannot perform operation with current type(s)\n");
 
 													}
@@ -572,10 +563,8 @@ literal 		: int_literal 					{
 													else {
 														$$.stringval = "1";
 												}
-													printf("literal 3\n");
 												}
 				| CHARLIT	 					{
-													printf("literal 2\n");
 												}
 				;
 int_literal 	: DEC 							{
@@ -604,7 +593,7 @@ void gencode()
 	nextquad = createQuad();
 }
 int main (int argc, char *argv[]) {
-	
+	int priTOS=0, priQUA =0;
 	globalCode = l_init();
 	nextquad = createQuad();
 	FILE *fp;
@@ -624,18 +613,20 @@ int main (int argc, char *argv[]) {
 				} else if (!strcmp(argv[i],"-version"))
 					printf("Version 1.0\n");
 				else if (!strcmp(argv[i], "-tos"))
-					printTos();
+					priTOS=1;
+
+				else if (!strcmp(argv[i], "-intcode"))
+					priQUA=1;
 				else
 					printf("Unknow option %s\n", argv[i]);
 			}
 		}
 	} 
-
 	yyin = fp;
 	yyparse();
-	printf("\n\nFINAL l_print\n");
-	//l_print(globalCode);
 	FILE *out = fopen(outputFile, "w");
 	l_translate(globalCode, out);
+	if(priTOS)	printTos();
+	if(priQUA) l_print(globalCode);
 	return 0;
 }

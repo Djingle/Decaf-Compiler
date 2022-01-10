@@ -131,6 +131,9 @@ void printQuad(Quadruplet q, Lquad l)
             if (q->op3->value.adresse_goto == NULL) printf("NULL\n");
             else printf("%d\n", l_place(l, q->op3->value.adresse_goto));
             break;
+        case Q_WRITEINT:
+            printf("Q_WRITEINT: %d\n", q->op1->value.cst);
+            break;
         case Q_ADD: printf("Q_ADD: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst);break;
         case Q_SUB: printf("Q_SUB: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst); break;
         case Q_MUL: printf("Q_MUL: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst); break;
@@ -164,7 +167,6 @@ Lquad l_complete(Lquad l,Quadruplet adresse){
                 }
                 break;
             default :
-                printf("%d : cannot l_complete\n",save->q->type);
                 break;
         }
         save = save->next;
@@ -205,13 +207,16 @@ void l_translate(Lquad l, FILE* out)
             case Q_ALLOC:
                 varsize += 4;
                 break;
+            case Q_WRITESTRING:
+                fprintf(out," : %s", save->q->op1->value.name);
+            
         }
         save = save->next;
     }
     fprintf(out, ".data\n");
     fprintf(out, "var: .space %d\n", varsize);
     fprintf(out, "temp: .space %d\n", tempsize);
-
+    fprintf(out, "newline: .asciiz \"\\n\"\n");
     fprintf(out, ".text\n");
     save = l;
     while (save != NULL)
@@ -311,6 +316,9 @@ void l_translate(Lquad l, FILE* out)
                 fprintf(out, "  li $v0, 1\n");
                 fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
                 fprintf(out, "  lw $a0, temp($t0)\n");
+                fprintf(out, "  syscall\n");
+                fprintf(out, "  li $v0, 4\n");
+                fprintf(out, "  la $a0, newline\n");
                 fprintf(out, "  syscall\n");
                 break;
             // case Q_WRITESTRING:

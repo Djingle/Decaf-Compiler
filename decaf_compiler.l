@@ -53,7 +53,7 @@ CHAR [a-zA-Z]|" "|"\n"
 "!"                     {return NON;}
 "&&"                    {return AND;}
 "||"                    {return OR;}
-{TYPE}                  {printf("FROM LEX: type is %s\n", yytext);yylval.constString = copystr(yytext);return TYPE;}
+{TYPE}                  {yylval.constString = copystr(yytext);return TYPE;}
 "true"|"false"          {yylval.constString = copystr(yytext);return BOOL;}
 "0x"{HEX_DIG}{HEX_DIG}* { yylval.constString = copystr(yytext); return HEX;}
 {DIG}{DIG}*             { yylval.constString =copystr(yytext); return DEC;}
