@@ -154,12 +154,12 @@ int newtempvar(){
         piletemp = temp;
     }
    
-        variable *v = pile->entries;
+        variable *v = piletemp->entries;
         variable *newEntree = (variable*)malloc(sizeof(variable));
-        newEntree->next = pile->entries;
+        newEntree->next = piletemp->entries;
         newEntree->adresse = tempcount;  // current est la derniere adresse utilisee
         tempcount += 4;   
-        pile->entries = newEntree;
+        piletemp->entries = newEntree;
         return newEntree->adresse;    
 }
 

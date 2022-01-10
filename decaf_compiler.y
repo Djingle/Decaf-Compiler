@@ -370,6 +370,8 @@ expr 			: location 						{
 				| expr INFEG expr				{	
 													if($1.type !=  $3.type){
 														//error et exit
+printf("cannot perform operation with current type(s)\n");
+
 													}
 													$$.type = $1.type;
 													// Instanciation of test quad
@@ -389,6 +391,8 @@ expr 			: location 						{
 				| expr SUPEG expr				{	
 													if($1.type !=  $3.type){
 														//error et exit
+printf("cannot perform operation with current type(s)\n");
+
 													}
 													$$.type = $1.type;
 													// Instanciation of test quad
@@ -407,6 +411,8 @@ expr 			: location 						{
 				| expr INF expr					{	
 													if($1.type !=  $3.type){
 														//error et exit
+printf("cannot perform operation with current type(s)\n");
+
 													}
 													$$.type = $1.type;
 													// Instanciation of test quad
@@ -425,6 +431,8 @@ expr 			: location 						{
 				| expr SUP expr					{	
 													if($1.type !=  $3.type){
 														//error et exit
+printf("cannot perform operation with current type(s)\n");
+
 													}
 													$$.type = $1.type;
 													// Instanciation of test quad
@@ -443,6 +451,8 @@ expr 			: location 						{
 				| expr B_EGAL expr				{	
 													if($1.type !=  $3.type){
 														//error et exit
+printf("cannot perform operation with current type(s)\n");
+
 													}
 													$$.type = $1.type;
 													// Instanciation of test quad
@@ -461,6 +471,8 @@ expr 			: location 						{
 				| expr B_NEGAL expr				{	
 													if($1.type !=  $3.type){
 														//error et exit
+printf("cannot perform operation with current type(s)\n");
+
 													}
 													$$.type = $1.type;
 													// Instanciation of test quad
@@ -479,6 +491,8 @@ expr 			: location 						{
 				| expr AND m expr				{
 													if($1.type != 1 || $4.type != 1){
 														//error et exit
+printf("cannot perform operation with current type(s)\n");
+
 													}
 													l_complete($1.vrai, $3);
 													$$.faux = l_concat($1.faux, $4.faux);
@@ -488,6 +502,8 @@ expr 			: location 						{
 				| expr OR m expr				{
 													if($1.type != 1 || $4.type != 1){
 														//error et exit
+printf("cannot perform operation with current type(s)\n");
+
 													}
 													l_complete($1.faux, $3);
 													$$.vrai = l_concat($1.vrai, $4.vrai);
@@ -497,6 +513,8 @@ expr 			: location 						{
 				| NON expr						{
 													if($2.type != 1){
 														//error et exit
+printf("cannot perform operation with current type(s)\n");
+
 													}
 													$$.vrai = $2.faux;
 													$$.faux = $2.vrai;
