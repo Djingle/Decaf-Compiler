@@ -23,6 +23,7 @@ Lquad globalCode = NULL;
 		Lquad faux;
 		int intval;
 		Quadop result;
+		int type;
 	} exprval;
 	struct {
 		Lquad next;
@@ -32,6 +33,7 @@ Lquad globalCode = NULL;
 		int intval;
 		int boolval;
 		char* stringval;
+		int type;
 	} constLiteral;
 	int constInt;
 	char* constString;
@@ -153,7 +155,7 @@ statement_l		: statement_l m statement							{
 																		$$.next = $1.next;
 																	}
 				;
-statement 		: location EGAL expr SEMICOL						{
+statement 		: location EGAL expr SEMICOL						{	
 																		// J'AI MIS DES FAUX TRUCS POUR TESTER, JE LES LAISSE COMME ÇA TU PEUX TEST ET VOIR SI LES GOTO VONT AU BON ENDROIT
 																		printf("now\n");
 																		Quadop op1 = createQuadop(QO_CST, (u)1000);
@@ -187,7 +189,8 @@ statement 		: location EGAL expr SEMICOL						{
 																		$3.vrai = l_complete($3.vrai, $5);
 																		printf("AVANT :\n");
 																		l_print(globalCode);
-																		$6.next = l_init();
+																		int type;
+				$6.next = l_init();
 																		$$.next = l_concat($3.faux, $6.next);
 																		printf("APRES :\n");
 																		l_print(globalCode);
@@ -241,6 +244,7 @@ t_expr 			: expr 							{
 												}
 				;
 location 		: ID 							{
+													
 													printf("ID detected in grammar %s\n", $1);
 													$$ = $1;
 													printf("location 1\n");
@@ -250,12 +254,14 @@ location 		: ID 							{
 												}
 				;
 expr 			: location 						{	
+													$$.isId = 1;
 													$$.intval=atoi($1);
 												}
 				| method_call 					{	
 													/*$$.val=execFct($1);*/		  //TODO
 												}           
 				| literal 						{ 	
+													$$.isId = 0;
 													$$.intval = atoi($1.stringval); 
 												}
 				| expr PLUS expr				{
@@ -407,8 +413,10 @@ expr 			: location 						{
 				;
 literal 		: int_literal 					{
 													$$.stringval = $1;
+													$$.type = 1;
 												} 
 				| BOOL							{
+													$$.type = 1;
 													if(!strcmp(yylval.constString, "false"))
 														$.stringval = "0";		
 													else
