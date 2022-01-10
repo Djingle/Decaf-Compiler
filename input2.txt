@@ -33,7 +33,12 @@ void main() {
         $t0 4 7 0 
 
         12 16
-        Q_ALLOC 4 a NULL
+        Q_ALLOC 4 NULL NULL
+
+
+        Q_ASSIGN 4 0 valeur
+        Q_ASSIGN 4 1 id
+
         int b;
         a = 1
         .....
