@@ -24,6 +24,7 @@ Lquad globalCode = NULL;
 		int intval;
 		Quadop result;
 		int type;
+        int isId;
 	} exprval;
 	struct {
 		Lquad next;
@@ -190,7 +191,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		printf("AVANT :\n");
 																		l_print(globalCode);
 																		int type;
-				$6.next = l_init();
+				                                                        $6.next = l_init();
 																		$$.next = l_concat($3.faux, $6.next);
 																		printf("APRES :\n");
 																		l_print(globalCode);
@@ -255,7 +256,7 @@ location 		: ID 							{
 				;
 expr 			: location 						{	
 													$$.isId = 1;
-													$$.intval=atoi($1);
+													$$.intval=atoi($1); // Recherche dans la table des symboles pour trouver la valeur de la variable à l'adresse location
 												}
 				| method_call 					{	
 													/*$$.val=execFct($1);*/		  //TODO
@@ -306,7 +307,8 @@ expr 			: location 						{
 													gencode();
 												}
 				| MOINS expr					{
-													printf("expr 5\n");
+
+													$$.intval = -$2.intval;
 												}
 				| expr INFEG expr				{
 													// Instanciation of test quad
@@ -418,9 +420,9 @@ literal 		: int_literal 					{
 				| BOOL							{
 													$$.type = 1;
 													if(!strcmp(yylval.constString, "false"))
-														$.stringval = "0";		
-													else
-														$.stringval = "1";
+														$$.stringval = "0";		
+													else {
+														$$.stringval = "1";
 												}
 													printf("literal 3\n");
 												}
