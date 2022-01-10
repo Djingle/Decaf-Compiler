@@ -249,6 +249,14 @@ void l_translate(Lquad l, FILE* out)
                 fprintf(out, "  add $t2, $t0, $t1\n");
                 fprintf(out, " sw $t2, temp($t3)\n");
                 break;
+            case Q_ADD_P:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  lw $t0, var($t0)\n");
+                fprintf(out, "  lw $t1, temp($t1)\n");
+                fprintf(out, "  add $t2, $t0, $t1\n");
+                fprintf(out, " sw $t2, var($t0)\n");
+                break;
             case Q_SUB:
                 fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
                 fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);

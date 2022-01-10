@@ -186,7 +186,7 @@ statement 		: location EGAL expr SEMICOL						{
 				| location PEGAL expr SEMICOL						{
 																		Quadop op1 = createQuadop(QO_CST, (u)getVal($1));
 																		Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-																		fillQuad(nextquad, Q_ADD, op1, op2, op1);
+																		fillQuad(nextquad, Q_ADD_P, op1, op2, op1);
 																		gencode();
 																	
 																		//incrementVar($1,atoi($3.stringval)); /// FROM AYOUB
