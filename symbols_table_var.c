@@ -81,6 +81,20 @@ adresselist* newVar(char* type){
     return adlist;
 }
 
+void printTos(){
+    printf("TOS: \n");
+    Scope *actuel = pile;
+    while(actuel){    
+        variable *v = actuel->entries;
+        while(v){
+            printf("%s  @ %d\n",v->name,v->adresse);
+            v = v->next;
+        }
+        actuel = actuel->parent;
+    }
+}
+
+
 
 
 /*

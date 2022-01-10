@@ -24,10 +24,10 @@ CHAR [a-zA-Z]|" "|"\n"
 " "                     {}
 \/\/[^\n\r]*"\n"        {}
 "class Program"         {return CLASSPRO;}
-"WriteInt(".*");"	    {}
-"WriteString(".*")"     {}
-"WriteBool(".*");"      {}
-"ReadInt(".*");"        {}
+"ReadInt"               {return READ;}
+"WriteInt"              {return WRITEINT;}
+"WriteBool"             {return WRITEBOOL;}
+"WriteString"           {return WRITESTRING;}
 "exit"				    {}
 ","                     {return COMMA;}
 {OBRACK}                {return OBRACK;}
@@ -65,6 +65,7 @@ CHAR [a-zA-Z]|" "|"\n"
 "return"                {return RETURN;}
 "break"                 {return BREAK;}
 "continue"              {return CONTINUE;}
+
 {ID}                    {
     yylval.constString = copystr(yytext);return ID;
     }

@@ -1,4 +1,5 @@
 #include "intermediate_code.h"
+#include "symbols_table_var.h"
 
 Quadop createQuadop(enum quadop_type type,u value){
     Quadop q = (Quadop)malloc(sizeof(quadop));
@@ -172,15 +173,168 @@ Lquad l_complete(Lquad l,Quadruplet adresse){
     return l;
 }
 
-// void l_translate(Lquad l, FILE* out)
-// {
-//     Lquad save = l;
-//     quad_type type = save->q->type;
-//     while (save != NULL)
-//     {
-//         switch(type){
-//             case Q_ADD:
-                
-//         }
-//     }
-// }
+Lquad reverse(Lquad l){
+    Lquad rev = NULL;
+    while(l){
+        Lquad temp = (Lquad)malloc(sizeof(Lquad));
+        temp->next = rev;
+        temp->q = l->q;
+        rev = temp;
+        temp = l;
+        l = l->next;
+        free(temp);
+    }
+    return rev;
+}
+
+void l_translate(Lquad l, FILE* out)
+{
+    l = reverse(l);
+    Lquad save = l;
+    quad_type type = save->q->type;
+    int tempsize = 0, varsize = 0;
+    int nblock = 0;
+   
+    while (save != NULL)
+    {   
+        switch(save->q->type){
+            case Q_ASSIGN_TEMP_ID:
+            case Q_ASSIGN_TEMP_VAL:
+                tempsize += 4;
+                break;
+            case Q_ALLOC:
+                varsize += 4;
+                break;
+        }
+        save = save->next;
+    }
+    fprintf(out, ".data\n");
+    fprintf(out, "var: .space %d\n", varsize);
+    fprintf(out, "temp: .space %d\n", tempsize);
+
+    fprintf(out, ".text\n");
+    save = l;
+    while (save != NULL)
+    {
+        fprintf(out, "block%d:\n", nblock);
+        switch(save->q->type){
+            case Q_ASSIGN_TEMP_ID:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  lw $t1, var($t1)\n");
+                fprintf(out, "  sw $t1, temp($t0)\n");
+                break;
+            case Q_ASSIGN_TEMP_VAL:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  sw $t1, temp($t0)\n");                
+                break;
+            case Q_ASSIGN:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  lw $t1, temp($t1)\n");
+                fprintf(out, "  sw $t1, var($t0)\n");
+                break;
+            case Q_ADD:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  li $t3, %d\n", save->q->op3->value.cst);
+                fprintf(out, "  lw $t0, temp($t0)\n");
+                fprintf(out, "  lw $t1, temp($t1)\n");
+                fprintf(out, "  add $t2, $t0, $t1\n");
+                fprintf(out, " sw $t2, temp($t3)\n");
+                break;
+            case Q_SUB:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  li $t3, %d\n", save->q->op3->value.cst);
+                fprintf(out, "  lw $t0, temp($t0)\n");
+                fprintf(out, "  lw $t1, temp($t1)\n");
+                fprintf(out, "  sub $t2, $t0, $t1\n");
+                fprintf(out, "  sw $t2, temp($t3)\n");
+                break;
+            case Q_MUL:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  li $t3, %d\n", save->q->op3->value.cst);
+                fprintf(out, "  lw $t0, temp($t0)\n");
+                fprintf(out, "  lw $t1, temp($t1)\n");
+                fprintf(out, "  mul $t2, $t0, $t1\n");
+                fprintf(out, "  sw $t2, temp($t3)\n");
+                break;
+            case Q_DIV:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  li $t3, %d\n", save->q->op3->value.cst);
+                fprintf(out, "  lw $t0, temp($t0)\n");
+                fprintf(out, "  lw $t1, temp($t1)\n");
+                fprintf(out, "  div $t2, $t0, $t1\n");
+                fprintf(out, "  sw $t2, temp($t3)\n");
+                break;
+            case Q_EQ:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  beq, $t1, $t0, block%d\n", l_place(l,save->q->op3->value.adresse_goto)); 
+                break;
+            case Q_GE:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  bge, $t1, $t0, block%d\n", l_place(l,save->q->op3->value.adresse_goto)); 
+                break;
+            case Q_GT:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  bgt, $t1, $t0, block%d\n", l_place(l,save->q->op3->value.adresse_goto)); 
+                break;
+            case Q_LE:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  ble, $t1, $t0, block%d\n", l_place(l,save->q->op3->value.adresse_goto)); 
+                break;
+            case Q_LT:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  blt, $t1, $t0, block%d\n", l_place(l,save->q->op3->value.adresse_goto)); 
+                break;
+            case Q_NE:
+                fprintf(out, "  li $t0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  li $t1, %d\n", save->q->op2->value.cst);
+                fprintf(out, "  bne, $t1, $t0, block%d\n", l_place(l,save->q->op3->value.adresse_goto)); 
+                break;
+            case Q_READ:
+                fprintf(out, "  li $v0, 5\n");
+                fprintf(out, "  syscall\n");
+                // fprintf(out, "li $t0, %d\n", save->q->op1->value.cst);
+                // fprintf(out, "sw $v0, temp($t0)\n");
+                break;
+            case Q_WRITEINT:
+                fprintf(out, "  li $v0, 1\n");
+                fprintf(out, "  li $a0, %d\n", save->q->op1->value.cst);
+                fprintf(out, "  syscall\n");
+                break;
+            // case Q_WRITESTRING:
+            //     fprintf(out, "li $v0, 4\n");
+            //     fprintf(out, "la $a0, %s\n", save->q->op1->value.string);
+            //     fprintf(out, "syscall\n");
+            //     break;
+            case Q_WRITEBOOL:
+                fprintf(out, "  li $v0, 4\n");
+                if(save->q->op1->value.cst == 1)
+                    fprintf(out, "  la $a0, true\n");
+                else
+                    fprintf(out, "  la $a0, false\n");
+                fprintf(out, "  syscall\n");
+                break;
+        }
+        nblock++;
+        save = save->next;
+    }
+    /*
+    exit:
+        li  $v0, 10
+        syscall
+    */
+    fprintf(out, "  exit:\n\tli  $v0, 10\n\tsyscall\n");
+}
+// temp: 40  
+// variable: 80

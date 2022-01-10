@@ -51,7 +51,7 @@ Lquad globalCode = NULL;
 //%type <constString> var_decl_l
 
 %start program
-
+%token READ WRITEINT WRITESTRING WRITEBOOL
 %token OBRACK CBRACK OPAR CPAR OSBRACK CSBRACK CLASSPRO BOOL DEC HEX CHARLIT SEMICOL COMMA
 %token <constString> TYPE ID
 %token EGAL PEGAL MEGAL MOINS PLUS FOIS DIVISER MODULO NON
@@ -204,6 +204,22 @@ statement 		: location EGAL expr SEMICOL						{
 				| method_call SEMICOL								{
 																		printf("statement 2\n");
 																		//execFct($1);				//TODO
+																	}
+				| READ OPAR location CPAR SEMICOL 						{
+																		
+																		Quadop op1 = createQuadop(QO_CST, (u)getVal($3));
+																		Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+																		fillQuad(nextquad, Q_SUB, op1, op2, op2);
+																		gencode();
+																	}
+				| WRITEINT OPAR expr CPAR SEMICOL 					{
+
+																	}
+				| WRITEBOOL OPAR expr CPAR SEMICOL 					{
+
+																	}
+				| WRITESTRING OPAR expr CPAR SEMICOL 					{
+
 																	}
 				| IF OPAR expr CPAR m block							{
 																		printf("Test :\n");
@@ -587,8 +603,8 @@ int main (int argc, char *argv[]) {
 					outputFile = argv[i];
 				} else if (!strcmp(argv[i],"-version"))
 					printf("Version 1.0\n");
-				//else if (strcmp(argv[i], "-tos"))
-					//printTos();
+				else if (!strcmp(argv[i], "-tos"))
+					printTos();
 				else
 					printf("Unknow option %s\n", argv[i]);
 			}
@@ -598,6 +614,8 @@ int main (int argc, char *argv[]) {
 	yyin = fp;
 	yyparse();
 	printf("\n\nFINAL l_print\n");
-	l_print(globalCode);
+	//l_print(globalCode);
+	FILE *out = fopen(outputFile, "w");
+	l_translate(globalCode, out);
 	return 0;
 }

@@ -50,4 +50,5 @@ int getVal(char *);
 variable* lookup(char *);
 char* convertIntegerToChar(int n);
 void printAllVars();
+void printTos();
 #endif
