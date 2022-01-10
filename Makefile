@@ -4,7 +4,7 @@ all: y.tab.o lex.yy.o intermediate_code.o symbols_table_var.o utility.o
 	gcc y.tab.o lex.yy.o intermediate_code.o symbols_table_var.o utility.o -lfl -o $(prefixe)
 
 
-y.tab.o: $(prefixe).y intermediate_code.h
+y.tab.o: $(prefixe).y intermediate_code.h symbols_table_var.h
 	yacc -v -d $(prefixe).y
 	gcc -c y.tab.c
 
