@@ -10,10 +10,13 @@ int symbols[52];
 int symbolVal(char symbol);
 void updateSymbolVal(char symbol, int val);
 extern FILE *yyin;
+FILE* out;
 int yydebug = 1;
 Quadruplet nextquad = NULL;
 Lquad globalCode = NULL;
 %}
+
+
 %union {
 	struct {
 		Lquad vrai;
@@ -173,7 +176,7 @@ statement 		: location EGAL expr SEMICOL						{
 																		printf("statement 1b\n");
 																		//decrementVar($1,atoi($3.stringval));
 																	}
-					| method_call SEMICOL							{
+				| method_call SEMICOL								{
 																		printf("statement 2\n");
 																		//execFct($1);				//TODO
 																	}
@@ -247,7 +250,7 @@ location 		: ID 							{
 												}
 				;
 expr 			: location 						{	
-													$$.intval=atoi($1);			
+													$$.intval=atoi($1);
 												}
 				| method_call 					{	
 													/*$$.val=execFct($1);*/		  //TODO
@@ -259,39 +262,41 @@ expr 			: location 						{
 													printf("On est là\n");
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													Quadop res = createQuadop(QO_CST, (u)(op1->value.cst+op2->value.cst));
-													printf("op1->val : %d\n", op1->value.cst);
-													printf("op2->val : %d\n", op2->value.cst);
-													printf("res->val : %d\n", res->value.cst);
-													fillQuad(nextquad, Q_ADD, op1, op2, res);
-													$$.intval = op1->value.cst + op2->value.cst;
+													Quadop resAdd = createQuadop(QO_CST, (u)(op1->value.cst+op2->value.cst));
+													fillQuad(nextquad, Q_ADD, op1, op2, resAdd);
+													$$.intval = resAdd->value.cst;
 													gencode();
 												}
 				| expr MOINS expr				{	Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													fillQuad(nextquad, Q_SUB, op1, op2, $$.result);
-													$$.intval = op1->value.cst - op2->value.cst;
+													Quadop resSub = createQuadop(QO_CST, (u)(op1->value.cst-op2->value.cst));
+													fillQuad(nextquad, Q_SUB, op1, op2, resSub);
+													$$.intval = resSub->value.cst;
 													gencode();
 												}
 				| expr FOIS expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													fillQuad(nextquad, Q_MUL, op1, op2, $$.result);
-													$$.intval = op1->value.cst * op2->value.cst;
+													Quadop resMult = createQuadop(QO_CST, (u)(op1->value.cst*op2->value.cst));
+													printf("resVal : %d\t resCalc : %d\n", resMult->value.cst, op1->value.cst*op2->value.cst);
+													fillQuad(nextquad, Q_MUL, op1, op2, resMult);
+													$$.intval = resMult->value.cst;
 													gencode();
 												}
 				| expr DIVISER expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													fillQuad(nextquad, Q_DIV, op1, op2, $$.result);
-													$$.intval = op1->value.cst / op2->value.cst;
+													Quadop resDiv = createQuadop(QO_CST, (u)(op1->value.cst/op2->value.cst));
+													fillQuad(nextquad, Q_DIV, op1, op2, resDiv);
+													$$.intval = resDiv->value.cst;
 													gencode();
 												}
 				| expr MODULO expr				{
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													fillQuad(nextquad, Q_MOD, op1, op2, $$.result);
-													$$.intval = op1->value.cst % op2->value.cst;
+													Quadop resMod = createQuadop(QO_CST, (u)(op1->value.cst%op2->value.cst));
+													fillQuad(nextquad, Q_MOD, op1, op2, resMod);
+													$$.intval = resMod->value.cst;
 													gencode();
 												}
 				| MOINS expr					{
