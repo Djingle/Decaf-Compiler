@@ -9,6 +9,11 @@ typedef struct tempvar{
     struct tempvar* next;
 }tempvar;
 
+typedef struct adresselist{
+    int adresse;
+    struct adresselist* next;
+}adresselist;
+
 typedef union operand_val operand_val;
 typedef enum operand_type {
     OP_INT, OP_BOOL
@@ -32,16 +37,17 @@ typedef struct scope{
     struct scope *parent;
 } Scope;
 
- 
+void push_adresselist(adresselist **l, int adresse);
 void listvar(char* name);
 void clearListVar();
 void pushctx();
 void popctx();
 Scope *currentctx();
-void newVar(char *);
+adresselist* newVar(char *);
+int newtempvar();
 //variable *setVal(char *, char *);
 int getVal(char *);
 variable* lookup(char *);
 char* convertIntegerToChar(int n);
-
+void printAllVars();
 #endif

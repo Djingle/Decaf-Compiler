@@ -135,7 +135,10 @@ void printQuad(Quadruplet q, Lquad l)
         case Q_MUL: printf("Q_MUL: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst); break;
         case Q_DIV: printf("Q_DIV: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst); break;
         case Q_MOD: printf("Q_MOD: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst); break;
-        case Q_ASSIGN: printf("Q_ASSIGN: %d %d \n", q->op1->value.cst, q->op2->value.cst); break; // Wesh BG ca va ?
+        case Q_ASSIGN: printf("Q_ASSIGN: %d %d \n", q->op1->value.cst, q->op2->value.cst); break;
+        case Q_ALLOC: printf("Q_ALLOC: %d NULL NULL\n", q->op1->value.cst); break;
+        case Q_ASSIGN_TEMP_ID: printf("Q_ASSIGN_TEMP_ID: %d %d NULL\n", q->op1->value.cst, q->op2->value.cst); break;
+        case Q_ASSIGN_TEMP_VAL: printf("Q_ASSIGN_TEMP_VAL: %d %d NULL\n", q->op1->value.cst, q->op2->value.cst); break;
     }
 }
 Lquad l_complete(Lquad l,Quadruplet adresse){

@@ -2,6 +2,7 @@
 //extern int yylval;
 #include "intermediate_code.h"
 #include "y.tab.h"
+#include "utility.h"
 void yyerror (char *s);
 int yylex();
 %}
@@ -52,10 +53,10 @@ CHAR [a-zA-Z]|" "|"\n"
 "!"                     {return NON;}
 "&&"                    {return AND;}
 "||"                    {return OR;}
-{TYPE}                  {yylval.constString = yytext;return TYPE;}
-"true"|"false"          {yylval.constString = yytext;return BOOL;}
-"0x"{HEX_DIG}{HEX_DIG}* { yylval.constString = yytext; return HEX;}
-{DIG}{DIG}*             { yylval.constString =yytext; return DEC;}
+{TYPE}                  {printf("FROM LEX: type is %s\n", yytext);yylval.constString = copystr(yytext);return TYPE;}
+"true"|"false"          {yylval.constString = copystr(yytext);return BOOL;}
+"0x"{HEX_DIG}{HEX_DIG}* { yylval.constString = copystr(yytext); return HEX;}
+{DIG}{DIG}*             { yylval.constString =copystr(yytext); return DEC;}
 ";"                     {return SEMICOL;}
 "void"                  {return VOID;}
 "for"                   {return FOR;}
@@ -65,8 +66,8 @@ CHAR [a-zA-Z]|" "|"\n"
 "break"                 {return BREAK;}
 "continue"              {return CONTINUE;}
 {ID}                    {
-    printf("ID detected: %s\n", yytext);
-    yylval.constString = yytext;return ID;}
+    yylval.constString = copystr(yytext);return ID;
+    }
 
 \'{CHAR}\'              {
         // int temp = yytext[0];

@@ -1,45 +1,11 @@
-void main() {
-        int nombre, non, oui;
-        nombre = 1;
-        if (nombre == 1) {
-            int a;
-            a= 1;
-        }
-        
-        else {  }
-        for()
+class Program {
+    void main() {
+            int nombre, non, oui;
+            int k;
+            nombre = 1;
+            if (nombre == 1) {
+                int a;
+                a = 1;
+            }
     }
-
-        nombre 
-        if (nombre == 1) {
-            ;
-        }
-        else {  }
-
-        int a;
-        
-
-        Q_ALLOC 4 0 NU
-        a: 4
-        a 
-        0
-
-        b
-        4
-
-        c
-        8
-        $t0(0)
-        $t0 4 7 0 
-
-        12 16
-        Q_ALLOC 4 NULL NULL
-
-
-        Q_ASSIGN 4 0 valeur
-        Q_ASSIGN 4 1 id
-
-        int b;
-        a = 1
-        .....
-        b = a + 4;
+}

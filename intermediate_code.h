@@ -16,7 +16,8 @@ typedef enum quadop_type {
 } quadop_type;
 typedef enum quad_type {
     Q_ASSIGN,Q_ADD,Q_SUB,Q_MUL,Q_DIV,Q_MOD,Q_EQ,Q_NE,Q_LT,Q_GT,Q_LE,Q_GE,
-    Q_AND,Q_OR,Q_NOT,Q_RETURN,Q_GOTO,Q_IF,Q_CALL,Q_PARAM,Q_READ,Q_WRITE, Q_ALLOC
+    Q_AND,Q_OR,Q_NOT,Q_RETURN,Q_GOTO,Q_IF,Q_CALL,Q_PARAM,Q_READ,Q_WRITE, Q_ALLOC, 
+    Q_ASSIGN_TEMP_ID, Q_ASSIGN_TEMP_VAL
 } quad_type;
 
 typedef struct quadop{
@@ -54,6 +55,5 @@ Lquad l_concat(Lquad l1, Lquad l2);
 Lquad l_complete(Lquad l,Quadruplet adresse);
 
 void gencode();
-Quadop newtemp();
 
 #endif  

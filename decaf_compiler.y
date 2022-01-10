@@ -4,8 +4,10 @@ int yylex();
 #include <stdio.h>     /* C declarations used in actions */
 #include <stdlib.h>
 #include <stdbool.h>
+#include<string.h>
 #include "symbols_table_var.h"
 #include "intermediate_code.h"
+#include "utility.h"
 int symbols[52];
 int symbolVal(char symbol);
 void updateSymbolVal(char symbol, int val);
@@ -23,8 +25,8 @@ Lquad globalCode = NULL;
 		Lquad faux;
 		int intval;
 		Quadop result;
-		int type;		// 0: val   1: logic
-        int isId;
+		int type;		// 0: int   1: bool
+        int isId;		// 0: valeur 1:ID
 	} exprval;
 	struct {
 		Lquad next;
@@ -68,10 +70,15 @@ program   		: CLASSPRO OBRACK t_fielDecl t_methoDecl CBRACK		{
 																	}
 				;
 t_fielDecl		: t_fielDecl TYPE field_elem SEMICOL				{	// SEUL LE CAS OÛ 	field_elem -> ID
-																		Quadop op1 = createQuadop(QO_NAME, $3);
-																		fillQuad(nextquad, Q_ALLOC, op1, op1, op1);
-																		gencode();
-																		newVar($2);
+																		adresselist *adresses;
+																		adresses = newVar($2);
+																		while(adresses){
+																			Quadop op1 = createQuadop(QO_CST, (u)adresses->adresse);
+																			Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+																			fillQuad(nextquad, Q_ALLOC, op1, op2, op2);
+																			gencode();
+																			adresses = adresses->next;
+																		}
 																	}
 				| /*empty*/											{}
 				;
@@ -89,8 +96,8 @@ methoDecl_l		: methoDecl_l method_decl							{
 				;
 field_elem		: field_elem COMMA ID OSBRACK int_literal CSBRACK	{} 							
 				| ID OSBRACK int_literal CSBRACK					{} 						
-				| field_elem COMMA ID								{} //TODO & màj ligne 70
-				| ID												{$$ = $1;} 
+				| field_elem COMMA ID								{listvar($3);}
+				| ID												{listvar($1);} 
 				;
 method_decl		: 	VOID ID OPAR t_param CPAR block					{	
 																		//newFct($2);	
@@ -121,18 +128,34 @@ t_varDecl		: var_decl_l										{
 																	}
 				| /*empty*/ 										{}
 				;
-var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{	// SEUL LE CAS OÛ 	var_elem -> ID
-																		Quadop op1 = createQuadop(QO_NAME, $3);
-																		fillQuad(nextquad, Q_ALLOC, op1, op1, op1);
-																		gencode();
-																		newVar($2);
+var_decl_l		: var_decl_l TYPE var_elem SEMICOL					{	
+																		adresselist *adresses;
+																		adresses = newVar($2);
+																		while(adresses){
+																			Quadop op1 = createQuadop(QO_CST, (u)adresses->adresse);
+																			Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+																			fillQuad(nextquad, Q_ALLOC, op1, op2, op2);
+																			gencode();
+																			adresses = adresses->next;
+																		}
 																	}
-				| TYPE var_elem SEMICOL								{	//newVar($1);	}
+				| TYPE var_elem SEMICOL								{	
+																		adresselist *adresses;
+																		adresses = newVar($1);
+																		while(adresses){
+																			Quadop op1 = createQuadop(QO_CST, (u)adresses->adresse);
+																			Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+																			fillQuad(nextquad, Q_ALLOC, op1, op2, op2);
+																			gencode();
+																			adresses = adresses->next;
+																		}
+																	}
 				;
-var_elem		: ID												{$$=$1}
+var_elem		: ID												{
+																		listvar($1);
+																	}
 				| var_elem COMMA ID									{															//TODO & MÀJ ligne 124
-																		//listvar($3);
-																		//printf("ID detected in Grammar %s\n", $3);
+																		listvar($3);
 																		//pushVar($3.constString);
 																	}
 
@@ -147,28 +170,29 @@ statement_l		: statement_l m statement							{	$1.next = l_complete($1.next, $2)
 				| statement											{	$$.next = $1.next;	}
 				;
 statement 		: location EGAL expr SEMICOL						{	
+																		//ADRESSE de location dans tab1
+																		//ADRESSE de expr dans tab2
 																		// J'AI MIS DES FAUX TRUCS POUR TESTER, JE LES LAISSE COMME ÇA TU PEUX TEST ET VOIR SI LES GOTO VONT AU BON ENDROIT
 																		// Je suis pas tres sur de ce que j'ai ecrit avant le gencode, please check before use
 																		printf("now\n");
 																		//setVal($1,convertIntegerToChar($3.intval)); 	// FROM AYOUB
 																		//setVar($1,$3.val); 	// FROM AYOUB
-																		Quadop op1 = createQuadop(QO_CST, (u)$1.constString); 	// wesh BG ca va ? 
+																		Quadop op1 = createQuadop(QO_CST, (u)getVal($1));
 																		Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 																		fillQuad(nextquad, Q_ASSIGN, op1, op2, op1);
 																		gencode();
 																	}
 				| location PEGAL expr SEMICOL						{
-																		Quadop op1 = createQuadop(QO_CST, (u)2000);
-																		Quadop op2 = createQuadop(QO_CST, (u)2000);
+																		Quadop op1 = createQuadop(QO_CST, (u)getVal($1));
+																		Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 																		fillQuad(nextquad, Q_ADD, op1, op2, op1);
 																		gencode();
-																		//setVal($1);
 																		printf("statement 1a\n");
 																		//incrementVar($1,atoi($3.stringval)); /// FROM AYOUB
 																	}
 				| location MEGAL expr SEMICOL						{	
-																		Quadop op1 = createQuadop(QO_CST, (u)2000);
-																		Quadop op2 = createQuadop(QO_CST, (u)2000);
+																		Quadop op1 = createQuadop(QO_CST, (u)getVal($1));
+																		Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
 																		fillQuad(nextquad, Q_SUB, op1, op2, op1);
 																		gencode();
 																		printf("statement 1b\n");
@@ -240,73 +264,114 @@ t_expr 			: expr 							{
 												}
 				;
 location 		: ID 							{		
-													printf("ID detected in grammar %s\n", $1);
-													$$ = $1; //$$.constString = $1;
+													$$ = copystr($1); //$$.constString = $1;
 													printf("location 1\n");
 												}
 				| ID OSBRACK expr CSBRACK		{
 													printf("location 2\n");
 												}
 				;
-expr 			: location 						{	$$.type = 0;  
-													//$$.isId = 1;
-													//$$.intval=atoi($1); // Recherche dans la table des symboles pour trouver la valeur de la variable à l'adresse location
-													$$.intval=atoi($1.constString); 
+expr 			: location 						{	  
+													$$.intval = newtempvar();
+													
+													Quadop op1 = createQuadop(QO_CST, (u)$$.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)getVal($1));
+													Quadop op3 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+													fillQuad(nextquad, Q_ASSIGN_TEMP_ID, op1, op2, op3);
+													gencode();
+													//$$.intval=getVal($1); // Recherche dans la table des symboles pour trouver la valeur de la variable à l'adresse location
+													//$$.intval=atoi($1.constString); 
 												}
 				| method_call 					{	// $$.type = 0; 
 													//$$.val=execFct($1);	  //TODO
 												}           
-				| literal 						{ 	$$.type = 1;	
-													//$$.isId = 0;
-													$$.intval = atoi($1.stringval); 
+				| literal 						{ 		
+													$$.intval = newtempvar();
+													
+													Quadop op1 = createQuadop(QO_CST, (u)$$.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)atoi($1.stringval));
+													Quadop op3 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+													fillQuad(nextquad, Q_ASSIGN_TEMP_VAL, op1, op2, op3);
+													gencode();
 												}
-				| expr PLUS expr				{	$$.type = 0;
+				| expr PLUS expr				{	
+													if($1.type != 0 || $3.type != 0){
+														//error and exit
+													}
+													$$.type = 0;
 													printf("On est là\n");
+													$$.intval = $1.intval;
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													Quadop resAdd = createQuadop(QO_CST, (u)(op1->value.cst+op2->value.cst));
+													Quadop resAdd = createQuadop(QO_CST, (u)$$.intval);
 													fillQuad(nextquad, Q_ADD, op1, op2, resAdd);
-													$$.intval = resAdd->value.cst;
 													gencode();
 												}
-				| expr MOINS expr				{	$$.type = 0;
+				| expr MOINS expr				{	
+													if($1.type != 0 || $3.type != 0){
+														//error and exit
+													}
+													$$.type = 0;
+													$$.intval = $1.intval;
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													Quadop resSub = createQuadop(QO_CST, (u)(op1->value.cst-op2->value.cst));
+													Quadop resSub = createQuadop(QO_CST, (u)$$.intval);
 													fillQuad(nextquad, Q_SUB, op1, op2, resSub);
-													$$.intval = resSub->value.cst;
 													gencode();
 												}
-				| expr FOIS expr				{	$$.type = 0;
+				| expr FOIS expr				{	
+													if($1.type != 0 || $3.type != 0){
+														//error and exit
+													}
+													$$.type = 0;
+													$$.intval = $1.intval;
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													Quadop resMult = createQuadop(QO_CST, (u)(op1->value.cst*op2->value.cst));
-													printf("resVal : %d\t resCalc : %d\n", resMult->value.cst, op1->value.cst*op2->value.cst);
+													Quadop resMult = createQuadop(QO_CST, (u)$$.intval);
 													fillQuad(nextquad, Q_MUL, op1, op2, resMult);
-													$$.intval = resMult->value.cst;
 													gencode();
 												}
-				| expr DIVISER expr				{	$$.type = 0;
+				| expr DIVISER expr				{	
+													if($1.type != 0 || $3.type != 0){
+														//error and exit
+													}
+													$$.type = 0;
+													$$.intval = $1.intval;
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													Quadop resDiv = createQuadop(QO_CST, (u)(op1->value.cst/op2->value.cst));
+													Quadop resDiv = createQuadop(QO_CST, (u)$$.intval);
 													fillQuad(nextquad, Q_DIV, op1, op2, resDiv);
-													$$.intval = resDiv->value.cst;
 													gencode();
 												}
-				| expr MODULO expr				{	$$.type = 0;
+				| expr MODULO expr				{	
+													if($1.type != 0 || $3.type != 0){
+														//error and exit
+													}
+													$$.type = 0;
+													$$.intval = $1.intval;
 													Quadop op1 = createQuadop(QO_CST, (u)$1.intval);
 													Quadop op2 = createQuadop(QO_CST, (u)$3.intval);
-													Quadop resMod = createQuadop(QO_CST, (u)(op1->value.cst%op2->value.cst));
+													Quadop resMod = createQuadop(QO_CST, (u)$$.intval);
 													fillQuad(nextquad, Q_MOD, op1, op2, resMod);
-													$$.intval = resMod->value.cst;
 													gencode();
 												}
 				| MOINS expr					{
+													if($2.type != 0){
+														//error and exit
+													}
 													$$.type = $2.type;
-													$$.intval = -$2.intval;
+													$$.intval = $2.intval;
+													Quadop op1 = createQuadop(QO_CST, (u)$2.intval);
+													Quadop op2 = createQuadop(QO_CST, (u)(Quadruplet)NULL);
+													Quadop resMoins = createQuadop(QO_CST, (u)$$.intval);
+													fillQuad(nextquad, Q_SUB, resMoins, op1, op2);
+													gencode();
 												}
-				| expr INFEG expr				{	$$.type = 1;
+				| expr INFEG expr				{	
+													if($1.type !=  $3.type){
+														//error et exit
+													}
+													$$.type = $1.type;
 													// Instanciation of test quad
 													$$.vrai = l_create(nextquad);
 													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
@@ -321,7 +386,11 @@ expr 			: location 						{	$$.type = 0;
 													gencode();
 													// À TESTER AVANT D'IMPLÉMENTER LES AUTRES (MÊME BAIL, JUSTE LE TYPE DE QUAD QUI CHANGE)
 												}
-				| expr SUPEG expr				{	$$.type = 1;
+				| expr SUPEG expr				{	
+													if($1.type !=  $3.type){
+														//error et exit
+													}
+													$$.type = $1.type;
 													// Instanciation of test quad
 													$$.vrai = l_create(nextquad);
 													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
@@ -335,7 +404,11 @@ expr 			: location 						{	$$.type = 0;
 													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
 													gencode();
 												}
-				| expr INF expr					{	$$.type = 1;
+				| expr INF expr					{	
+													if($1.type !=  $3.type){
+														//error et exit
+													}
+													$$.type = $1.type;
 													// Instanciation of test quad
 													$$.vrai = l_create(nextquad);
 													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
@@ -349,7 +422,11 @@ expr 			: location 						{	$$.type = 0;
 													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
 													gencode();
 												}
-				| expr SUP expr					{	$$.type = 1;
+				| expr SUP expr					{	
+													if($1.type !=  $3.type){
+														//error et exit
+													}
+													$$.type = $1.type;
 													// Instanciation of test quad
 													$$.vrai = l_create(nextquad);
 													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
@@ -363,7 +440,11 @@ expr 			: location 						{	$$.type = 0;
 													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
 													gencode();
 												}
-				| expr B_EGAL expr				{	$$.type = 1;
+				| expr B_EGAL expr				{	
+													if($1.type !=  $3.type){
+														//error et exit
+													}
+													$$.type = $1.type;
 													// Instanciation of test quad
 													$$.vrai = l_create(nextquad);
 													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
@@ -377,7 +458,11 @@ expr 			: location 						{	$$.type = 0;
 													fillQuad(nextquad, Q_GOTO, gt2, NULL, NULL);
 													gencode();
 												}
-				| expr B_NEGAL expr				{	$$.type = 1;
+				| expr B_NEGAL expr				{	
+													if($1.type !=  $3.type){
+														//error et exit
+													}
+													$$.type = $1.type;
 													// Instanciation of test quad
 													$$.vrai = l_create(nextquad);
 													Quadop gt1 = createQuadop(QO_GOTO, (u)(Quadruplet)NULL);
@@ -392,18 +477,27 @@ expr 			: location 						{	$$.type = 0;
 													gencode();
 												}
 				| expr AND m expr				{
+													if($1.type != 1 || $4.type != 1){
+														//error et exit
+													}
 													l_complete($1.vrai, $3);
 													$$.faux = l_concat($1.faux, $4.faux);
 													$$.vrai = $4.vrai;
 													$$.type = 1;
 												}
 				| expr OR m expr				{
+													if($1.type != 1 || $4.type != 1){
+														//error et exit
+													}
 													l_complete($1.faux, $3);
 													$$.vrai = l_concat($1.vrai, $4.vrai);
 													$$.faux = $4.faux;
 													$$.type = 1;
 												}
 				| NON expr						{
+													if($2.type != 1){
+														//error et exit
+													}
 													$$.vrai = $2.faux;
 													$$.faux = $2.vrai;
 													$$.type = 1;

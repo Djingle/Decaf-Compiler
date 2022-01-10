@@ -2,6 +2,8 @@
 #include <string.h>
 tempvar *templist = NULL; 
 Scope *pile = NULL;
+Scope *piletemp = NULL;
+int tempcount = 0;
 int current = 0; // current est la derniere adresse utilisee
 void pushctx(){
     Scope *temp = (Scope*)malloc(sizeof(Scope));
@@ -22,7 +24,9 @@ Scope *currentctx(){
 
 void listvar(char* name){
     tempvar* newname = (tempvar*)malloc(sizeof(tempvar));
-    newname->name = name;
+    int size = strlen(name);
+    newname->name = (char*)malloc(sizeof(char)*size);
+    strcpy(newname->name,name);
     newname->next = templist;
     templist = newname;
 }
@@ -35,7 +39,8 @@ void clearListVar(){
     }
 }
 
-void newVar(char* type){
+adresselist* newVar(char* type){
+    adresselist *adlist = NULL;
     printf("attempting newVar with %s\n",type);
     if(!pile)
         pushctx();
@@ -46,7 +51,7 @@ void newVar(char* type){
         while(v){
             if(!strcmp(v->name, temp->name)){
                 printf("%s is already declared\n",v->name);
-                return;
+                return NULL;
             }
             v = v->next;
         }
@@ -57,7 +62,7 @@ void newVar(char* type){
             temp_type = OP_BOOL;
         else{
             printf("\"%s\" is not a type\n", type);
-            return;
+            return NULL;
         }
         variable *newEntree = (variable*)malloc(sizeof(variable));
         newEntree->next = pile->entries;
@@ -67,10 +72,15 @@ void newVar(char* type){
         newEntree->type = temp_type;
         pile->entries = newEntree;
         temp = temp->next;
+        push_adresselist(&adlist, newEntree->adresse);
     }
     
     clearListVar();
+    printf("\npour le moment on a les variables suivant\n");
+    printAllVars();
+    return adlist;
 }
+
 
 
 /*
@@ -95,14 +105,15 @@ variable *setVal(char *name, char* val){
     return NULL;
 }*/
 
-int getAdrr(char *name){
+int getVal(char *name){
     printf("attempting to get adresse of name = \"%s\" ", name);
     if(pile == NULL)
         return -1;
     Scope *c = pile;
     while(c){
         variable *compteur = c->entries;
-        while(compteur){
+        while(compteur){    tempvar *temp = templist;
+
         if(!strcmp(compteur->name, name))
             return compteur->adresse;  
         compteur = compteur->next;
@@ -133,7 +144,31 @@ variable* lookup(char *name){
 
 
 
+// GESTION VARIABLE TEMPORAIRES
 
+int newtempvar(){
+    if(!piletemp){
+        Scope *temp = (Scope*)malloc(sizeof(Scope));
+        temp->parent = piletemp;
+        temp->entries = NULL;
+        piletemp = temp;
+    }
+   
+        variable *v = pile->entries;
+        variable *newEntree = (variable*)malloc(sizeof(variable));
+        newEntree->next = pile->entries;
+        newEntree->adresse = tempcount;  // current est la derniere adresse utilisee
+        tempcount += 4;   
+        pile->entries = newEntree;
+        return newEntree->adresse;    
+}
+
+void push_adresselist(adresselist **l, int adresse){
+    adresselist *temp = (adresselist*)malloc(sizeof(adresselist));
+    temp->next = *l;
+    temp->adresse = adresse;
+    *l = temp;
+}
 
 
 // FONCTIONS DE TEST
@@ -163,6 +198,7 @@ void printAllVars(){
 }
 //UTILITY
 
+
 char* convertIntegerToChar(int n)
 {
  
@@ -190,7 +226,7 @@ char* convertIntegerToChar(int n)
 }
 
 
-int main(){
+/*int main(){
     newVariable("temp", "int");
     newVariable("temp10", "int");
 
@@ -208,3 +244,4 @@ int main(){
     printAllVars();
     return 1;
 }
+*/
