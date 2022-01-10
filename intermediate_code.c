@@ -131,15 +131,12 @@ void printQuad(Quadruplet q, Lquad l)
             else printf("%d\n", l_place(l, q->op3->value.adresse_goto));
             break;
         case Q_ADD:
-            printf("Q_ADD: %d, %d, %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst);
-            // if(q->op3->value.adresse_goto == NULL) printf("NULL\n");
-            // else
-            //     printf("%d\n",l_place(l, q->op3->value.adresse_goto));
+            printf("Q_ADD: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst);
             break;
-        case Q_SUB: printf("Q_SUB: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->type); break;
-        case Q_MUL: printf("Q_MUL: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->type); break;
-        case Q_DIV: printf("Q_DIV: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->type); break;
-        case Q_MOD: printf("Q_MOD: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->type); break;
+        case Q_SUB: printf("Q_SUB: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst); break;
+        case Q_MUL: printf("Q_MUL: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst); break;
+        case Q_DIV: printf("Q_DIV: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst); break;
+        case Q_MOD: printf("Q_MOD: %d %d %d\n", q->op1->value.cst, q->op2->value.cst, q->op3->value.cst); break;
     }
 }
 Lquad l_complete(Lquad l,Quadruplet adresse){
